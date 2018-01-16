@@ -23,12 +23,14 @@ const PERMISSIONED_NODES = "$HOME/alastria/data/permissioned-nodes.json"
 
 var IDENTITY, NODE_TYPE, STATIC, PERMISSIONED string
 
+// Restart an Alastria node
 func Restart() bool {
 	Stop()
 	Start()
 	return true
 }
 
+// Stop an Alastria node
 func Stop() bool {
 	out, err := exec.Command("$HOME/alastria-node/scripts/stop.sh").Output()
 	fmt.Println(out, err)
@@ -39,6 +41,7 @@ func Stop() bool {
 	return true
 }
 
+// Start an Alastria node
 func Start() bool {
 	out, err := exec.Command("$HOME/alastria-node/scripts/start.sh").Output()
 	fmt.Println(out, err)
@@ -49,6 +52,7 @@ func Start() bool {
 	return true
 }
 
+// Update config files and restart an Alastria node
 func Update() bool {
 	var err error
 	fmt.Printf("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
@@ -82,6 +86,7 @@ func Update() bool {
 	return true
 }
 
+//Compute Status for a node
 func Status() bool {
 	out, err := exec.Command("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}')").Output()
 	if err != nil {
