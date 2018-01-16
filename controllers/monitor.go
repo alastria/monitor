@@ -7,7 +7,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// Operations about object
+// Monitor operations
 type MonitorController struct {
 	beego.Controller
 }

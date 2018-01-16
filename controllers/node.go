@@ -6,7 +6,7 @@ import (
 	"github.com/astaxie/beego"
 )
 
-// Operations about object
+// Node operations
 type NodeController struct {
 	beego.Controller
 }
