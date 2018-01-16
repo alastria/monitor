@@ -79,3 +79,20 @@ func (m *NodeController) RestartNode() {
 	m.Data["json"] = &output
 	m.ServeJSON()
 }
+
+// @Title statusNode
+// @Description Status Alastria node
+// @Success 200 {status} string
+// @Failure 403 : error
+// @router /status [get]
+func (m *NodeController) StatusNode() {
+	output := make(map[string]string)
+	if lib.Status() {
+		output["status"] = "ok"
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}

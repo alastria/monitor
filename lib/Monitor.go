@@ -2,6 +2,7 @@ package lib
 
 import (
 	"fmt"
+	"log"
 	//	"math/big"
 	"encoding/hex"
 	"io"
@@ -79,6 +80,17 @@ func Update() bool {
 		return false
 	}
 	return true
+}
+
+func Status() bool {
+	out, err := exec.Command("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}')").Output()
+	if err != nil {
+		log.Fatal(err)
+	}
+	if string(out) != "" {
+		return true
+	}
+	return false
 }
 
 func getGithub(url string) (filename, contenido string) {
