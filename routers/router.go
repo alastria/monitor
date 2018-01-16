@@ -30,6 +30,12 @@ func init() {
 				&controllers.MonitorController{},
 			),
 		),
+
+		beego.NSNamespace("/node",
+			beego.NSInclude(
+				&controllers.NodeController{},
+			),
+		),
 	)
 	beego.AddNamespace(ns)
 }

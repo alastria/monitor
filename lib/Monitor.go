@@ -22,7 +22,34 @@ const PERMISSIONED_NODES = "$HOME/alastria/data/permissioned-nodes.json"
 
 var IDENTITY, NODE_TYPE, STATIC, PERMISSIONED string
 
-func update() {
+func Restart() bool {
+	Stop()
+	Start()
+	return true
+}
+
+func Stop() bool {
+	out, err := exec.Command("$HOME/alastria-node/scripts/stop.sh").Output()
+	fmt.Println(out, err)
+	time.Sleep(100 * time.Millisecond)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func Start() bool {
+	out, err := exec.Command("$HOME/alastria-node/scripts/start.sh").Output()
+	fmt.Println(out, err)
+	time.Sleep(100 * time.Millisecond)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
+func Update() bool {
+	var err error
 	fmt.Printf("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
 	stfile, static := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/static-nodes.json")
 	pmfile, permissioned := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/permissioned-nodes_" + NODE_TYPE + ".json")
@@ -48,6 +75,10 @@ func update() {
 			fmt.Println(out, err)
 		}
 	}
+	if err != nil {
+		return false
+	}
+	return true
 }
 
 func getGithub(url string) (filename, contenido string) {
