@@ -18,9 +18,10 @@ contract Version {
     }
 
     modifier onlyOwner {
-        if (msg.sender != owner) 
-        throw;
-        _;
+	require(msg.sender == owner);
+        #if (msg.sender != owner) 
+        #throw;
+        #_;
     }
 
     function updateVersion(string _version, string _nodeVersion, string _monitorVersion) public onlyOwner {
