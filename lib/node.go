@@ -1,6 +1,7 @@
 package lib
 
 import (
+	"bytes"
 	"fmt"
 	"log"
 	//	"math/big"
@@ -18,8 +19,10 @@ import (
 	//"github.com/alastria/monitor/services"
 )
 
-const STATIC_NODES = "$HOME/alastria/data/static-nodes.json"
-const PERMISSIONED_NODES = "$HOME/alastria/data/permissioned-nodes.json"
+var homeDir = os.Getenv("HOME")
+
+var STATIC_NODES = homeDir + "/alastria/data/static-nodes.json"
+var PERMISSIONED_NODES = homeDir + "/alastria/data/permissioned-nodes.json"
 
 var IDENTITY, NODE_TYPE, STATIC, PERMISSIONED string
 
@@ -30,9 +33,23 @@ func Restart() bool {
 	return true
 }
 
+func debugCommand() {
+	cmd := exec.Command(homeDir + "/alastria-node/scripts/stop.sh")
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Run()
+	if err != nil {
+		fmt.Println("Error: " + fmt.Sprint(err) + ": " + stderr.String())
+		return
+	}
+	fmt.Println("Result: " + out.String())
+}
+
 // Stop an Alastria node
 func Stop() bool {
-	out, err := exec.Command("$HOME/alastria-node/scripts/stop.sh").Output()
+	out, err := exec.Command(homeDir + "/alastria-node/scripts/stop.sh").Output()
 	fmt.Println(out, err)
 	time.Sleep(100 * time.Millisecond)
 	if err != nil {
@@ -43,7 +60,7 @@ func Stop() bool {
 
 // Start an Alastria node
 func Start() bool {
-	out, err := exec.Command("$HOME/alastria-node/scripts/start.sh").Output()
+	out, err := exec.Command(homeDir + "/alastria-node/scripts/start.sh").Output()
 	fmt.Println(out, err)
 	time.Sleep(100 * time.Millisecond)
 	if err != nil {
@@ -73,10 +90,10 @@ func Update() bool {
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
 			fmt.Println("Hay que reiniciar el nodo...")
-			out, err := exec.Command("$HOME/alastria-node/scripts/stop.sh").Output()
+			out, err := exec.Command(homeDir + "/alastria-node/scripts/stop.sh").Output()
 			fmt.Println(out, err)
 			time.Sleep(15000 * time.Millisecond)
-			out, err = exec.Command("$HOME/alastria-node/scripts/start.sh", "all").Output()
+			out, err = exec.Command(homeDir+"/alastria-node/scripts/start.sh", "all").Output()
 			fmt.Println(out, err)
 		}
 	}
@@ -84,6 +101,11 @@ func Update() bool {
 		return false
 	}
 	return true
+}
+
+// Non-returning Update function for its use in CRON
+func UpdateCron() {
+	Update()
 }
 
 //Compute Status for a node
