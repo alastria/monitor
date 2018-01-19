@@ -1,7 +1,9 @@
 package controllers
 
 import (
+	"encoding/json"
 	"monitor/lib"
+	"monitor/models"
 
 	"github.com/astaxie/beego"
 )
@@ -94,5 +96,22 @@ func (m *NodeController) StatusNode() {
 	}
 
 	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title ProposeCandidate
+// @Description Propose new validator candidate
+// @Param	body		body 	models.ProposeReq	true		"Propose a new candidate"
+// @Success 200  {status} string
+// @Failure 403 error in propose
+// @router /propose [post]
+func (m *NodeController) ProposeCandidate() {
+	var r models.ProposeReq
+	json.Unmarshal(m.Ctx.Input.RequestBody, &r)
+	if lib.Propose((&r).Candidate, (&r).Value) {
+		m.Data["json"] = map[string]string{"status": "ok"}
+	} else {
+		m.Data["json"] = map[string]string{"status": "propose failed"}
+	}
 	m.ServeJSON()
 }

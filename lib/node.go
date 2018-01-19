@@ -103,6 +103,18 @@ func Update() bool {
 	return true
 }
 
+// Propose new candidate
+func Propose(candidate string, value string) bool {
+	cmdStr := "geth --exec 'istanbul.propose(\"" + candidate + "\", " + value + ")' attach http://localhost:22000"
+	out, err := exec.Command(cmdStr).Output()
+	fmt.Println(out, err)
+	time.Sleep(100 * time.Millisecond)
+	if err != nil || string(out) != "null" {
+		return false
+	}
+	return true
+}
+
 // Non-returning Update function for its use in CRON
 func UpdateCron() {
 	Update()
