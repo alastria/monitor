@@ -109,7 +109,8 @@ func Propose(candidate string, value string) bool {
 	out, err := exec.Command(cmdStr).Output()
 	fmt.Println(out, err)
 	time.Sleep(100 * time.Millisecond)
-	if err != nil || string(out) != "null" {
+	//TODO: Check the output of the command. We can test the condition commented below
+	if err != nil { //|| string(out) != "null" {
 		return false
 	}
 	return true
