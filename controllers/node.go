@@ -2,8 +2,9 @@ package controllers
 
 import (
 	"encoding/json"
-	"monitor/lib"
-	"monitor/models"
+
+	"github.com/alastria/monitor/lib"
+	"github.com/alastria/monitor/models"
 
 	"github.com/astaxie/beego"
 )
