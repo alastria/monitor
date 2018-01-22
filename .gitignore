@@ -4,3 +4,5 @@ monitor
 routers/commentsRouter_controllers.go
 permissioned-nodes.json
 nohup.out
+/.idea/
+/vendor/
