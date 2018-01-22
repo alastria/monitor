@@ -1,4 +1,6 @@
 pragma solidity ^0.4.10;
+
+
 contract Version {
 
     struct Metadata {
@@ -9,8 +11,8 @@ contract Version {
         uint256 lastUpdated; //Block number it was lastUpdated
     }
 
-    address owner;
-    Metadata metadata;
+    address public owner;
+    Metadata public metadata;
 
     function Version(string _version) public {
         owner = msg.sender; //To verify that Alastria admins deployed the contract
@@ -18,10 +20,8 @@ contract Version {
     }
 
     modifier onlyOwner {
-	require(msg.sender == owner);
-        #if (msg.sender != owner) 
-        #throw;
-        #_;
+        require(msg.sender == owner);
+        _;
     }
 
     function updateVersion(string _version, string _nodeVersion, string _monitorVersion) public onlyOwner {
