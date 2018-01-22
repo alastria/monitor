@@ -6,3 +6,5 @@ permissioned-nodes.json
 nohup.out
 /.idea/
 /vendor/
+glide.lock
+fabric8-analytics.log
