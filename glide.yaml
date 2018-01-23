@@ -10,3 +10,6 @@ import:
   - rpc
 -package: github.com/robfig/cron
 -package: github.com/hashicorp/go-getter
+
+# To clean glide installations when there are errors:
+# $HOME/.glide/cache/
