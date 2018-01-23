@@ -92,10 +92,10 @@ func (m *NodeController) RestartNode() {
 // @router /status [get]
 func (m *NodeController) StatusNode() {
 	output := make(map[string]string)
-	if lib.Status() {
+	if string(lib.Status()) != "" {
 		output["status"] = "ok"
 	} else {
-		output["status"] = "error occurred"
+		output["status"] = "stopped"
 	}
 
 	m.Data["json"] = &output

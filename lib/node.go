@@ -49,8 +49,31 @@ func runCommand(command string) (ok bool, salida string) {
 		// log.Debug(salida)
 		return
 	}
-	salida = "Result: " + out.String()
-	log.Debug(salida)
+	ok = true
+	salida = out.String()
+	// log.Debug(salida)
+	fmt.Println("Result: " + salida)
+	return
+}
+
+func runCommandBackground(command string) (ok bool, salida string) {
+	cmd := exec.Command("bash", "-c", command)
+	var out bytes.Buffer
+	var stderr bytes.Buffer
+	cmd.Stdout = &out
+	cmd.Stderr = &stderr
+	err := cmd.Start()
+	if err != nil {
+		ok = false
+		salida = "Error: " + fmt.Sprint(err) + ": " + stderr.String()
+		fmt.Println(salida)
+		// log.Debug(salida)
+		return
+	}
+	ok = true
+	salida = out.String()
+	// log.Debug(salida)
+	fmt.Println("Result: " + salida)
 	return
 }
 
@@ -62,34 +85,34 @@ func Stop() (ok bool) {
 
 // Start an Alastria node
 func Start() (ok bool) {
-	ok, _ = runCommand(homeDir + "/alastria-node/scripts/start.sh")
+	ok, _ = runCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
 	return
 }
 
 // Update config files and restart an Alastria node
 func Update() bool {
 	var err error
-	log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
+	// log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
 	stfile, static := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/static-nodes.json")
 	pmfile, permissioned := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/permissioned-nodes_" + NODE_TYPE + ".json")
 	if strings.Compare(static, STATIC) != 0 || strings.Compare(permissioned, PERMISSIONED) != 0 {
 
-		log.Trace("Son distintos")
+		// log.Trace("Son distintos")
 		if strings.Compare(static, STATIC) != 0 {
-			log.Trace("Actualizando static-nodes")
+			// log.Trace("Actualizando static-nodes")
 			copy(stfile, STATIC_NODES)
 		}
 		if strings.Compare(permissioned, PERMISSIONED) != 0 {
-			log.Trace("Actualizando permissioned-nodes")
+			// log.Trace("Actualizando permissioned-nodes")
 			copy(pmfile, PERMISSIONED_NODES)
 		}
-		log.Debug(strings.Trim(static, "]"), strings.Trim(STATIC, "]"))
+		// log.Debug(strings.Trim(static, "]"), strings.Trim(STATIC, "]"))
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
-			log.Trace("Hay que reiniciar el nodo...")
+			// log.Trace("Hay que reiniciar el nodo...")
 			runCommand(homeDir + "/alastria-node/scripts/stop.sh")
 			time.Sleep(15000 * time.Millisecond)
-			runCommand(homeDir + "/alastria-node/scripts/start.sh all")
+			runCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
 		}
 	}
 	if err != nil {
@@ -111,8 +134,8 @@ func UpdateCron() {
 }
 
 //Compute Status for a node
-func Status() (ok bool) {
-	ok, _ = runCommand("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}'")
+func Status() (salida string) {
+	_, salida = runCommand("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}'")
 	return
 }
 
@@ -120,7 +143,7 @@ func getGithub(url string) (filename, contenido string) {
 	filename = tempFileName("monitor", ".json")
 	err := getter.GetFile(filename, url)
 	if err != nil {
-		log.Warn("getGithub: %s", err)
+		// log.Warn("getGithub: %s", err)
 	}
 	if err == nil {
 		contenido = getFile(filename)
@@ -135,15 +158,15 @@ func getFile(fichero string) (contenido string) {
 }
 
 func copy(stfrom, stto string) {
-	log.Debug(stfrom, stto)
+	// log.Debug(stfrom, stto)
 	from, err := os.Open(stfrom)
 	if err != nil {
-		log.Warn("copy: ", err)
+		// log.Warn("copy: ", err)
 	}
 	defer from.Close()
 	to, err := os.Open(stto)
 	if err != nil {
-		log.Warn("copy: ", err)
+		// log.Warn("copy: ", err)
 	}
 	defer to.Close()
 	io.Copy(from, to)
