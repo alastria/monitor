@@ -36,7 +36,7 @@ func Restart() bool {
 }
 
 func runCommand(command string) (ok bool, salida string) {
-	cmd := exec.Command(command)
+	cmd := exec.Command("bash", "-c", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
 	cmd.Stdout = &out
@@ -45,7 +45,8 @@ func runCommand(command string) (ok bool, salida string) {
 	if err != nil {
 		ok = false
 		salida = "Error: " + fmt.Sprint(err) + ": " + stderr.String()
-		log.Debug(salida)
+		fmt.Println(salida)
+		// log.Debug(salida)
 		return
 	}
 	salida = "Result: " + out.String()

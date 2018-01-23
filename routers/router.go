@@ -8,7 +8,8 @@
 package routers
 
 import (
-	"github.com/alastria/monitor/controllers"
+	// "github.com/alastria/monitor/controllers"
+	"monitor/controllers"
 
 	"github.com/astaxie/beego"
 )
