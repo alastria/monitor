@@ -1,20 +1,18 @@
 package main
 
 import (
+	"crypto/tls"
+	"crypto/x509"
 	"io/ioutil"
+	"os"
+	"path/filepath"
+	"strings"
 
 	gh "github.com/alastria/monitor/middleware"
 	hydra "github.com/ory-am/hydra/sdk"
 
-	// "fmt"
-	// "monitor/lib"
-
 	"github.com/alastria/monitor/lib"
 	_ "github.com/alastria/monitor/routers"
-	// "time"
-
-	"crypto/tls"
-	"crypto/x509"
 
 	"github.com/astaxie/beego"
 	"github.com/astaxie/beego/logs"
@@ -23,15 +21,33 @@ import (
 
 var hc *hydra.Client
 var log *logs.BeeLogger
+var path string
 
 func main() {
+	var err error
+	log = logs.GetBeeLogger()
+	log.Trace("main is IN")
+	path, err = filepath.Abs(os.Args[0])
+	path = path[0:strings.LastIndex(path, "/")]
+
+	log.Debug(path, err)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
 		beego.BConfig.WebConfig.StaticDir["/swagger"] = "swagger"
+
+		/*		beego.InsertFilter("*", beego.BeforeRouter,cors.Allow(&cors.Options{
+				AllowAllOrigins: true,
+				AllowMethods: []string{"GET", "DELETE", "PUT", "PATCH", "OPTIONS"},
+				AllowHeaders: []string{"Origin", "Access-Control-Allow-Origin"},
+				ExposeHeaders: []string{"Content-Length", "Access-Control-Allow-Origin"},
+				AllowCredentials: true,
+			}))*/
+
 	} else {
-		beego.BeeApp.Server.TLSConfig = configureTLS()
+		//beego.BeeApp.Server.TLSConfig = configureTLS()
 		configureOauth2()
 	}
+	beego.BeeApp.Server.TLSConfig = configureTLS()
 
 	// Start CRON
 	c := cron.New()
@@ -40,7 +56,7 @@ func main() {
 
 	// Start REST API
 	beego.Run()
-
+	log.Trace("main is OUT!")
 }
 
 func configureTLS() *tls.Config {
@@ -49,13 +65,13 @@ func configureTLS() *tls.Config {
 
 	// http://www.levigross.com/2015/11/21/mutual-tls-authentication-in-go/
 	// Load our TLS key pair to use for authentication
-	cert, err := tls.LoadX509KeyPair(beego.AppConfig.String("TLSCertFile"), beego.AppConfig.String("TLSKeyFile"))
+	cert, err := tls.LoadX509KeyPair(path+beego.AppConfig.String("TLSCertFile"), path+beego.AppConfig.String("TLSKeyFile"))
 	if err != nil {
 		log.Error("Unable to load cert", err)
 	}
 
 	// Load our CA certificate
-	clientCACert, err := ioutil.ReadFile(beego.AppConfig.String("TLSCACertFile"))
+	clientCACert, err := ioutil.ReadFile(path + beego.AppConfig.String("TLSCACertFile"))
 	if err != nil {
 		log.Error("Unable to open cert", err)
 	}
@@ -82,10 +98,10 @@ func configureOauth2() {
 	var err error
 	// Initialize Hydra and gin-hydra
 	if hc, err = hydra.Connect(
-		hydra.ClientID("ftl-client"),
-		hydra.ClientSecret("7Vc7VZUtrbJ9sDCQ"),
-		hydra.ClusterURL("http://localhost:4444"),
-		hydra.Scopes("openid", "ftl"),
+		hydra.ClientID(path+beego.AppConfig.String("OAUTH2_CLIENT_ID")),
+		hydra.ClientSecret(path+beego.AppConfig.String("OAUTH2_CLIENT_SECRET")),
+		hydra.ClusterURL(path+beego.AppConfig.String("OAUTH2_CLUSTER_URL")),
+		hydra.Scopes(path+beego.AppConfig.String("OAUTH2_SCOPES")),
 	); err != nil {
 		panic(err)
 	}
