@@ -8,8 +8,11 @@ import:
   - core/types
   - ethclient
   - rpc
--package: github.com/robfig/cron
--package: github.com/hashicorp/go-getter
-
+- package: github.com/robfig/cron
+- package: github.com/hashicorp/go-getter
+- package: github.com/ory-am/hydra
+  version: ~0.7.7
+  subpackages:
+  - sdk
 # To clean glide installations when there are errors:
 # $HOME/.glide/cache/
