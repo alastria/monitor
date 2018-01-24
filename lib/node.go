@@ -123,7 +123,7 @@ func Update() bool {
 
 // Log an Alastria node
 func GetLog() (ok bool, data string) {
-	ok, data = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh")
+	ok, data = RunCommand(homeDir + "/alastria-node/scripts/log.sh")
 	return
 }
 
