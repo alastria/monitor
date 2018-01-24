@@ -35,7 +35,7 @@ func Restart() bool {
 	return true
 }
 
-func runCommand(command string) (ok bool, salida string) {
+func RunCommand(command string) (ok bool, salida string) {
 	cmd := exec.Command("bash", "-c", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -56,7 +56,7 @@ func runCommand(command string) (ok bool, salida string) {
 	return
 }
 
-func runCommandBackground(command string) (ok bool, salida string) {
+func RunCommandBackground(command string) (ok bool, salida string) {
 	cmd := exec.Command("bash", "-c", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -79,13 +79,13 @@ func runCommandBackground(command string) (ok bool, salida string) {
 
 // Stop an Alastria node
 func Stop() (ok bool) {
-	ok, _ = runCommand(homeDir + "/alastria-node/scripts/stop.sh")
+	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 	return
 }
 
 // Start an Alastria node
 func Start() (ok bool) {
-	ok, _ = runCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
 	return
 }
 
@@ -110,9 +110,9 @@ func Update() bool {
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
 			// log.Trace("Hay que reiniciar el nodo...")
-			runCommand(homeDir + "/alastria-node/scripts/stop.sh")
+			RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 			time.Sleep(15000 * time.Millisecond)
-			runCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
+			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
 		}
 	}
 	if err != nil {
@@ -121,10 +121,16 @@ func Update() bool {
 	return true
 }
 
+// Log an Alastria node
+func GetLog() (ok bool, data string) {
+	ok, data = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh")
+	return
+}
+
 // Propose new candidate
 func Propose(candidate string, value string) (ok bool) {
 	cmdStr := "geth --exec 'istanbul.propose(\"" + candidate + "\", " + value + ")' attach http://localhost:22000"
-	ok, _ = runCommand(cmdStr)
+	ok, _ = RunCommand(cmdStr)
 	return
 }
 
@@ -135,7 +141,7 @@ func UpdateCron() {
 
 //Compute Status for a node
 func Status() (salida string) {
-	_, salida = runCommand("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}'")
+	_, salida = RunCommand("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $2}'")
 	return
 }
 

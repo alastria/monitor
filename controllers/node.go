@@ -116,3 +116,65 @@ func (m *NodeController) ProposeCandidate() {
 	}
 	m.ServeJSON()
 }
+
+// @Title getLogs
+// @Description Get logs for the node
+// @Success 200 {status} logData
+// @Failure 403 : error
+// @router /logsraw [get]
+func (m *NodeController) GetLogs() {
+	output := make(map[string]string)
+	ok, data := lib.GetLog()
+	if ok {
+		output["data"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title getLogsJson
+// @Description Get logs with a fancy formatted JSON
+// @Success 200 {status} logData
+// @Failure 403 : error
+// @router /logsjson [get]
+func (m *NodeController) GetLogsJson() {
+	output := make(map[string]string)
+
+	_, port1 := lib.RunCommand("lsof -i | grep *:21000 | awk '{print $8 $9 $10}'")
+	_, port2 := lib.RunCommand("lsof -i | grep *:22000 | awk '{print $8 $9 $10}'")
+	_, port3 := lib.RunCommand("lsof -i | grep *:9000 | awk '{print $8 $9 $10}'")
+
+	_, nodeInfo := lib.RunCommand("geth -exec 'admin.nodeInfo' attach ~/alastria/data/geth.ipc")
+	_, peers := lib.RunCommand("geth -exec 'admin.peers' attach ~/alastria/data/geth.ipc")
+	_, blockNumber := lib.RunCommand("geth -exec 'eth.blockNumber' attach ~/alastria/data/geth.ipc")
+	_, mining := lib.RunCommand("geth -exec 'eth.mining' attach ~/alastria/data/geth.ipc")
+	_, syncing := lib.RunCommand("geth -exec 'eth.syncing' attach ~/alastria/data/geth.ipc")
+	_, pendingTransactions := lib.RunCommand("geth -exec 'eth.pendingTransactions' attach ~/alastria/data/geth.ipc")
+	_, candidates := lib.RunCommand("geth -exec 'istanbul.candidates' attach ~/alastria/data/geth.ipc")
+	_, getValidators := lib.RunCommand("geth -exec 'istanbul.getValidators()' attach ~/alastria/data/geth.ipc")
+	_, peerCount := lib.RunCommand("geth -exec 'net.peerCount' attach ~/alastria/data/geth.ipc")
+	_, netVersion := lib.RunCommand("geth -exec 'net.version' attach ~/alastria/data/geth.ipc")
+	_, txPool := lib.RunCommand("geth -exec 'txpool.content' attach ~/alastria/data/geth.ipc")
+
+	output["port1"] = port1
+	output["port2"] = port2
+	output["port3"] = port3
+
+	output["nodeInfo"] = nodeInfo
+	output["peers"] = peers
+	output["blockNumber"] = blockNumber
+	output["mining"] = mining
+	output["syncing"] = syncing
+	output["pendingTransactions"] = pendingTransactions
+	output["candidates"] = candidates
+	output["getValidators"] = getValidators
+	output["peerCount"] = peerCount
+	output["netVersion"] = netVersion
+	output["txPool"] = txPool
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
