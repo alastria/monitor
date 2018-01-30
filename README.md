@@ -13,3 +13,11 @@ All the installation and runnning operations for the monitor are managed through
 ```
 ./monitor.sh start
 ```
+* Check current version of the monitor
+```
+./monitor.sh version
+```
+* Check latest version available for the monitor in the repository
+```
+./monitor.sh latest
+```
