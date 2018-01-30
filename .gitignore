@@ -1,7 +1,7 @@
 swagger/
 lastupdate.tmp
 monitor
-routers/commentsRouter_controllers.go
+routers/commentsRouter_*.go
 permissioned-nodes.json
 nohup.out
 /.idea/

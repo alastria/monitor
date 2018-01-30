@@ -127,6 +127,25 @@ func GetLog() (ok bool, data string) {
 	return
 }
 
+// Get current Version of the monitor
+func CurrentMonitorVersion() (ok bool, version string) {
+	// ok, version = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh latest")
+	ok, version = RunCommand("cd " + homeDir + "/alastria/monitor/src/github.com/alastria/monitor && git tag")
+	return
+}
+
+// Get latest Version of the monitor
+func LatestMonitorVersion() (ok bool, version string) {
+	ok, version = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh latest")
+	return
+}
+
+// Get latest Version of the monitor
+func UpdateMonitor() (ok bool) {
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh build")
+	return
+}
+
 // Propose new candidate
 func Propose(candidate string, value string) (ok bool) {
 	cmdStr := "geth --exec 'istanbul.propose(\"" + candidate + "\", " + value + ")' attach http://localhost:22000"

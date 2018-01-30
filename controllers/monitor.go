@@ -3,6 +3,7 @@ package controllers
 import (
 	"encoding/json"
 
+	"github.com/alastria/monitor/lib"
 	"github.com/alastria/monitor/models"
 
 	"github.com/astaxie/beego"
@@ -35,6 +36,50 @@ func (m *MonitorController) RestPostStatus() {
 func (m *MonitorController) RestGetStatus() {
 	output := make(map[string]string)
 	output["status"] = "ok"
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title GetVersion
+// @Description Check monitor version
+// @Success 200 {status, version} string Status, string Version
+// @Failure 403 : overload
+// @router /version [get]
+func (m *MonitorController) GetVersion() {
+	output := make(map[string]string)
+	_, current := lib.CurrentMonitorVersion()
+	_, latest := lib.LatestMonitorVersion()
+	if current != latest {
+		output["status"] = "outdated"
+	} else {
+		output["status"] = "ok"
+	}
+
+	output["version"] = current
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title GetVersionUpdate
+// @Description Check monitor version
+// @Success 200 {status, version} string Status (latest | updated)
+// @Failure 403 : overload
+// @router /versionupdate [get]
+func (m *MonitorController) GetVersionUpdate() {
+	output := make(map[string]string)
+	_, current := lib.CurrentMonitorVersion()
+	_, latest := lib.LatestMonitorVersion()
+
+	if current != latest {
+		if lib.UpdateMonitor() {
+			output["status"] = "updated"
+		} else {
+			output["status"] = "error"
+		}
+	} else {
+		output["status"] = "latest"
+	}
+
 	m.Data["json"] = &output
 	m.ServeJSON()
 }
