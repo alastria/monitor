@@ -135,6 +135,44 @@ func (m *NodeController) GetLogs() {
 	m.ServeJSON()
 }
 
+// @Title GetVersion
+// @Description Get current version of the node
+// @Success 200 {status} logStatus {version} nodeVersion
+// @Failure 403 : error
+// @router /version [get]
+func (m *NodeController) GetVersion() {
+	output := make(map[string]string)
+	ok, data := lib.NodeVersion()
+	if ok {
+		output["status"] = "ok"
+		output["version"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title NodeLastRestart
+// @Description Date/Hour of latest restart of the node
+// @Success 200 {status} Status {date} lastUpdate
+// @Failure 403 : error
+// @router /lastrestart [get]
+func (m *NodeController) NodeLastRestart() {
+	output := make(map[string]string)
+	ok, data := lib.LastNodeRestart()
+	if ok {
+		output["status"] = "ok"
+		output["lastUpdate"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
 // @Title getLogsJson
 // @Description Get logs with a fancy formatted JSON
 // @Success 200 {status} logData

@@ -164,6 +164,18 @@ func Status() (salida string) {
 	return
 }
 
+//Last node/geth Restart
+func LastNodeRestart() (ok bool, salida string) {
+	ok, salida = RunCommand("ps aux | grep geth  | grep alastria/data | grep -v grep | awk '{print $9}'")
+	return
+}
+
+//Node/Geth/Quorum Version
+func NodeVersion() (ok bool, salida string) {
+	ok, salida = RunCommand("geth version | grep geth")
+	return
+}
+
 func getGithub(url string) (filename, contenido string) {
 	filename = tempFileName("monitor", ".json")
 	err := getter.GetFile(filename, url)
