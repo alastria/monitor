@@ -109,7 +109,7 @@ func configureOauth2() {
 	gh.Init(hc)
 
 	// Use the middleware `ftl.db.user.byid`
-	beego.InsertFilter("/v1/user/certid/*", beego.BeforeRouter, gh.ScopesRequired("ftl.db.user.byid"))
+	//beego.InsertFilter("/v1/user/certid/*", beego.BeforeRouter, gh.ScopesRequired("alastria.db.user.byid"))
 
-	beego.InsertFilter("*", beego.BeforeRouter, gh.ScopesRequired("ftl"))
+	//beego.InsertFilter("*", beego.BeforeRouter, gh.ScopesRequired("alastria"))
 }
