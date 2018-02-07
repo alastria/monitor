@@ -49,6 +49,23 @@ func (m *NodeController) StartNode() {
 	m.ServeJSON()
 }
 
+// @Title CleanStartNode
+// @Description Starts the Alastria node clean
+// @Success 200 {status} string
+// @Failure 403 : error
+// @router /cleanstart [get]
+func (m *NodeController) CleanStartNode() {
+	output := make(map[string]string)
+	if lib.CleanStart() {
+		output["status"] = "ok"
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
 // @Title StopNode
 // @Description Stops the Alastria node
 // @Success 200 {status} string

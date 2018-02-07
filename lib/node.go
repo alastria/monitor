@@ -85,7 +85,13 @@ func Stop() (ok bool) {
 
 // Start an Alastria node
 func Start() (ok bool) {
-	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
+	return
+}
+
+// Clean Start an Alastria node
+func CleanStart() (ok bool) {
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
 	return
 }
 
@@ -112,7 +118,7 @@ func Update() bool {
 			// log.Trace("Hay que reiniciar el nodo...")
 			RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 			time.Sleep(15000 * time.Millisecond)
-			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh monitor")
+			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
 		}
 	}
 	if err != nil {
@@ -142,8 +148,13 @@ func LatestMonitorVersion() (ok bool, version string) {
 
 // Get latest Version of the monitor
 func UpdateMonitor() (ok bool) {
-	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh build")
-	return
+	ok1, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh build")
+	ok2, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh start")
+	if ok1 && ok2 {
+		return true
+	} else {
+		return false
+	}
 }
 
 // Propose new candidate
