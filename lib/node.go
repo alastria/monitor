@@ -92,6 +92,7 @@ func Start() (ok bool) {
 // Update config files and restart an Alastria node
 func Update() bool {
 	var err error
+	RunCommand("cd " + homeDir + "/alastria-node && git pull")
 	// log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
 	stfile, static := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/static-nodes.json")
 	pmfile, permissioned := getGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/permissioned-nodes_" + NODE_TYPE + ".json")
