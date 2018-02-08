@@ -49,6 +49,23 @@ func (m *NodeController) StartNode() {
 	m.ServeJSON()
 }
 
+// @Title CleanStartNode
+// @Description Starts the Alastria node clean
+// @Success 200 {status} string
+// @Failure 403 : error
+// @router /cleanstart [get]
+func (m *NodeController) CleanStartNode() {
+	output := make(map[string]string)
+	if lib.CleanStart() {
+		output["status"] = "ok"
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
 // @Title StopNode
 // @Description Stops the Alastria node
 // @Success 200 {status} string
@@ -127,6 +144,44 @@ func (m *NodeController) GetLogs() {
 	ok, data := lib.GetLog()
 	if ok {
 		output["data"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title GetVersion
+// @Description Get current version of the node
+// @Success 200 {status} logStatus {version} nodeVersion
+// @Failure 403 : error
+// @router /version [get]
+func (m *NodeController) GetVersion() {
+	output := make(map[string]string)
+	ok, data := lib.NodeVersion()
+	if ok {
+		output["status"] = "ok"
+		output["version"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title NodeLastRestart
+// @Description Date/Hour of latest restart of the node
+// @Success 200 {status} Status {date} lastUpdate
+// @Failure 403 : error
+// @router /lastrestart [get]
+func (m *NodeController) NodeLastRestart() {
+	output := make(map[string]string)
+	ok, data := lib.LastNodeRestart()
+	if ok {
+		output["status"] = "ok"
+		output["lastUpdate"] = data
 	} else {
 		output["status"] = "error occurred"
 	}
