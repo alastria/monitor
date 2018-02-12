@@ -160,7 +160,6 @@ func UpdateMonitor() (ok bool) {
 //Restart the complete network
 func RestartNetwork(nodeType string, nodeName string) (ok bool) {
 	ok1, _ := RunCommand("git pull && " + homeDir + "/alastria-node/scripts/stop.sh")
-	ok1, _ := RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 	ok2, _ := RunCommand(homeDir + "/alastria-node/scripts/init.sh backup " + nodeType + " " + nodeName)
 	ok3, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
 	if ok1 && ok2 && ok3 {
