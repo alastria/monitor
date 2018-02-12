@@ -134,6 +134,24 @@ func (m *NodeController) ProposeCandidate() {
 	m.ServeJSON()
 }
 
+// TODO: Ponerse a hacerlo
+// @Title NodeRestartNetwork
+// @Description Restart complete network for the node
+// @Param	body		body 	models.ResetartNetReq	true		"Restart the whole network"
+// @Success 200  {status} string
+// @Failure 403 error in restart
+// @router /restartNetwork [post]
+func (m *NodeController) NodeRestartNetwork() {
+	var r models.ProposeReq
+	json.Unmarshal(m.Ctx.Input.RequestBody, &r)
+	if lib.RestartNetwork((&r).NodeType, (&r).NodeName) {
+		m.Data["json"] = map[string]string{"status": "ok"}
+	} else {
+		m.Data["json"] = map[string]string{"status": "propose failed"}
+	}
+	m.ServeJSON()
+}
+
 // @Title getLogs
 // @Description Get logs for the node
 // @Success 200 {status} logData
