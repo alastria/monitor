@@ -65,7 +65,10 @@ func configureTLS() *tls.Config {
 
 	// http://www.levigross.com/2015/11/21/mutual-tls-authentication-in-go/
 	// Load our TLS key pair to use for authentication
-	cert, err := tls.LoadX509KeyPair(path+beego.AppConfig.String("TLSCertFile"), path+beego.AppConfig.String("TLSKeyFile"))
+	cert, err := tls.LoadX509KeyPair(
+		path+beego.AppConfig.String("TLSCertFile"),
+		path+beego.AppConfig.String("TLSKeyFile"),
+	)
 	if err != nil {
 		log.Error("Unable to load cert", err)
 	}
@@ -79,10 +82,13 @@ func configureTLS() *tls.Config {
 	clientCertPool.AppendCertsFromPEM(clientCACert)
 
 	tlsConfig := &tls.Config{
-		ClientAuth:               tls.RequireAndVerifyClientCert,
-		Certificates:             []tls.Certificate{cert},
-		ClientCAs:                clientCertPool,
-		CipherSuites:             []uint16{tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256, tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384},
+		ClientAuth:   tls.RequireAndVerifyClientCert,
+		Certificates: []tls.Certificate{cert},
+		ClientCAs:    clientCertPool,
+		CipherSuites: []uint16{
+			tls.TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256,
+			tls.TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384,
+		},
 		PreferServerCipherSuites: true,
 		MinVersion:               tls.VersionTLS12,
 	}
