@@ -24,8 +24,8 @@ All the installation and runnning operations for the monitor are managed through
 
 ## Available commands
 All the specific documentation for the API is also available through 
-* `/monitor/status [GET]`
-* `/monitor/status [POST]`
+* `/monitor/status [GET]`: Gets the status of the monitor
+* `/monitor/status [POST] {testString}`: Tests a POST request to the monitor to see if it works
 * `/monitor/version [GET]`: Checks current version of the monitor and if it is outdated.
 * `/monitor/versionUpdate [GET]`: Checks current version of the monitor and updates it 
 automatically if it is outdated
