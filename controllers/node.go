@@ -233,9 +233,10 @@ func (m *NodeController) NodeLastRestart() {
 func (m *NodeController) GetLogsJson() {
 	output := make(map[string]string)
 
-	_, port1 := lib.RunCommand("lsof -i | grep *:21000 | awk '{print $8 $9 $10}'")
-	_, port2 := lib.RunCommand("lsof -i | grep *:22000 | awk '{print $8 $9 $10}'")
-	_, port3 := lib.RunCommand("lsof -i | grep *:9000 | awk '{print $8 $9 $10}'")
+	_, port1 := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:21000 | awk '{print $8 $9 $10}'")
+	_, port2UDP := lib.RunCommand("lsof -iUDP -P -n | grep *:21000 | awk '{print $8 $9 $10}'")
+	_, port2TCP := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:22000 | awk '{print $8 $9 $10}'")
+	_, port3 := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:9000 | awk '{print $8 $9 $10}'")
 
 	_, nodeInfo := lib.RunCommand("geth -exec 'admin.nodeInfo' attach ~/alastria/data/geth.ipc")
 	_, peers := lib.RunCommand("geth -exec 'admin.peers' attach ~/alastria/data/geth.ipc")
@@ -250,7 +251,7 @@ func (m *NodeController) GetLogsJson() {
 	_, txPool := lib.RunCommand("geth -exec 'txpool.content' attach ~/alastria/data/geth.ipc")
 
 	output["port1"] = port1
-	output["port2"] = port2
+	output["port2"] = port2UDP + port2TCP
 	output["port3"] = port3
 
 	output["nodeInfo"] = nodeInfo
