@@ -152,6 +152,24 @@ func (m *NodeController) NodeRestartNetwork() {
 }
 
 // @Title getLogs
+// @Description Get coinbase of the node
+// @Success 200 {status} coinbase
+// @Failure 403 : error
+// @router /coinbase [get]
+func (m *NodeController) Coinbase() {
+	output := make(map[string]string)
+	ok, data := lib.GetCoinbase()
+	if ok {
+		output["data"] = data
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
+// @Title getLogs
 // @Description Get logs for the node
 // @Success 200 {status} logData
 // @Failure 403 : error

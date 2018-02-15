@@ -176,6 +176,13 @@ func Propose(candidate string, value string) (ok bool) {
 	return
 }
 
+// Gets coinbase from node
+func GetCoinbase() (ok bool, data string) {
+	cmdStr := "geth --exec 'eth.coinbase' attach http://localhost:22000"
+	ok, data = RunCommand(cmdStr)
+	return
+}
+
 // Non-returning Update function for its use in CRON
 func UpdateCron() {
 	Update()
