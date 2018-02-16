@@ -28,6 +28,10 @@ var PERMISSIONED_NODES = homeDir + "/alastria/data/permissioned-nodes.json"
 
 var IDENTITY, NODE_TYPE, STATIC, PERMISSIONED string
 
+func init() {
+	log = logs.GetBeeLogger()
+}
+
 // Restart an Alastria node
 func Restart() bool {
 	Stop()
@@ -36,6 +40,7 @@ func Restart() bool {
 }
 
 func RunCommand(command string) (ok bool, salida string) {
+	log.Trace("RunCommand(" + command + ")")
 	cmd := exec.Command("bash", "-c", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -45,18 +50,19 @@ func RunCommand(command string) (ok bool, salida string) {
 	if err != nil {
 		ok = false
 		salida = "Error: " + fmt.Sprint(err) + ": " + stderr.String()
-		fmt.Println(salida)
+		log.Debug("RunCommand.Result: "+salida+". Error: ", err)
 		// log.Debug(salida)
 		return
 	}
 	ok = true
 	salida = out.String()
 	// log.Debug(salida)
-	fmt.Println("Result: " + salida)
+	log.Trace("RunCommand. Result: " + salida)
 	return
 }
 
 func RunCommandBackground(command string) (ok bool, salida string) {
+	log.Trace("RunCommand(" + command + ")")
 	cmd := exec.Command("bash", "-c", command)
 	var out bytes.Buffer
 	var stderr bytes.Buffer
@@ -66,14 +72,12 @@ func RunCommandBackground(command string) (ok bool, salida string) {
 	if err != nil {
 		ok = false
 		salida = "Error: " + fmt.Sprint(err) + ": " + stderr.String()
-		fmt.Println(salida)
-		// log.Debug(salida)
+		log.Debug("RunCommandBackground.Result: "+salida+". Error: ", err)
 		return
 	}
 	ok = true
 	salida = out.String()
-	// log.Debug(salida)
-	fmt.Println("Result: " + salida)
+	log.Trace("RunCommandBackground.Result: " + salida)
 	return
 }
 
@@ -137,7 +141,7 @@ func GetLog() (ok bool, data string) {
 // Get current Version of the monitor
 func CurrentMonitorVersion() (ok bool, version string) {
 	// ok, version = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh latest")
-	ok, version = RunCommand("cd " + homeDir + "/alastria/monitor/src/github.com/alastria/monitor && git tag")
+	ok, version = RunCommand("cd " + homeDir + "/alastria/workspace/src/github.com/alastria/monitor && git tag")
 	return
 }
 
@@ -149,13 +153,8 @@ func LatestMonitorVersion() (ok bool, version string) {
 
 // Get latest Version of the monitor
 func UpdateMonitor() (ok bool) {
-	ok1, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh build")
-	ok2, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh start")
-	if ok1 && ok2 {
-		return true
-	} else {
-		return false
-	}
+	ok1, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh update")
+	return ok1
 }
 
 // Propose new candidate

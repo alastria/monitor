@@ -26,10 +26,11 @@ var path string
 func main() {
 	var err error
 	log = logs.GetBeeLogger()
+	log.SetLogger(logs.AdapterEs, `{"dsn":"http://localhost:9200/","level":1}`)
+
 	log.Trace("main is IN")
 	path, err = filepath.Abs(os.Args[0])
 	path = path[0:strings.LastIndex(path, "/")]
-
 	log.Debug(path, err)
 	if beego.BConfig.RunMode == "dev" {
 		beego.BConfig.WebConfig.DirectoryIndex = true
