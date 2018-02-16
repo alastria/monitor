@@ -8,3 +8,8 @@ type ProposeReq struct {
 	Candidate string
 	Value     string
 }
+
+type RestartNetReq struct {
+	NodeType string
+	NodeName string
+}

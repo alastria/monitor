@@ -83,19 +83,19 @@ func RunCommandBackground(command string) (ok bool, salida string) {
 
 // Stop an Alastria node
 func Stop() (ok bool) {
-	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
-	return
+	_, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
+	return true
 }
 
 // Start an Alastria node
 func Start() (ok bool) {
-	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
+	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/start.sh")
 	return
 }
 
 // Clean Start an Alastria node
 func CleanStart() (ok bool) {
-	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
+	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/start.sh clean")
 	return
 }
 
@@ -157,10 +157,29 @@ func UpdateMonitor() (ok bool) {
 	return ok1
 }
 
+//Restart the complete network
+func RestartNetwork(nodeType string, nodeName string) (ok bool) {
+	_, _ = RunCommand("cd " + homeDir + "/alastria-node/ && git pull")
+	_, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
+	ok1, _ := RunCommand("cd " + homeDir + "/alastria-node/scripts && ./init.sh backup " + nodeType + " " + nodeName)
+	ok2, _ := RunCommand(homeDir + "/alastria-node/scripts/start.sh clean")
+	if ok1 && ok2 {
+		return true
+	}
+	return false
+}
+
 // Propose new candidate
 func Propose(candidate string, value string) (ok bool) {
 	cmdStr := "geth --exec 'istanbul.propose(\"" + candidate + "\", " + value + ")' attach http://localhost:22000"
 	ok, _ = RunCommand(cmdStr)
+	return
+}
+
+// Gets coinbase from node
+func GetCoinbase() (ok bool, data string) {
+	cmdStr := "geth --exec 'eth.coinbase' attach http://localhost:22000"
+	ok, data = RunCommand(cmdStr)
 	return
 }
 
