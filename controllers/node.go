@@ -151,7 +151,7 @@ func (m *NodeController) NodeRestartNetwork() {
 	m.ServeJSON()
 }
 
-// @Title getLogs
+// @Title getCoinbase
 // @Description Get coinbase of the node
 // @Success 200 {status} coinbase
 // @Failure 403 : error
@@ -249,6 +249,7 @@ func (m *NodeController) GetLogsJson() {
 	_, peerCount := lib.RunCommand("geth -exec 'net.peerCount' attach ~/alastria/data/geth.ipc")
 	_, netVersion := lib.RunCommand("geth -exec 'net.version' attach ~/alastria/data/geth.ipc")
 	_, txPool := lib.RunCommand("geth -exec 'txpool.content' attach ~/alastria/data/geth.ipc")
+	_, coinbase := lib.RunCommand("geth --exec 'eth.coinbase' attach ~/alastria/data/geth.ipc")
 
 	output["port1"] = port1
 	output["port2"] = port2UDP + port2TCP
@@ -265,6 +266,7 @@ func (m *NodeController) GetLogsJson() {
 	output["peerCount"] = peerCount
 	output["netVersion"] = netVersion
 	output["txPool"] = txPool
+	output["coinbase"] = coinbase
 
 	m.Data["json"] = &output
 	m.ServeJSON()
