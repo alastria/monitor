@@ -271,3 +271,25 @@ func (m *NodeController) GetLogsJson() {
 	m.Data["json"] = &output
 	m.ServeJSON()
 }
+
+// @Title getIstanbulLog
+// @Description Get Istanbul related logs with a fancy formatted JSON
+// @Success 200 {status} logData
+// @Failure 403 : error
+// @router /logistanbul [get]
+func (m *NodeController) GetIstanbulLog() {
+	output := make(map[string]string)
+
+	_, enode := lib.RunCommand("geth --exec 'admin.nodeInfo' attach ~/alastria/data/geth.ipc | grep enode")
+	_, coinbase := lib.RunCommand("geth --exec 'eth.coinbase' attach ~/alastria/data/geth.ipc")
+	_, candidates := lib.RunCommand("geth --exec 'istanbul.candidates' attach ~/alastria/data/geth.ipc")
+	_, validators := lib.RunCommand("geth --exec 'istanbul.getValidators()' attach ~/alastria/data/geth.ipc")
+
+	output["enode"] = enode
+	output["coinbase"] = coinbase
+	output["candidates"] = candidates
+	output["validators"] = validators
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
