@@ -35,6 +35,30 @@ func (m *MonitorController) RestPostStatus() {
 // @router /status [get]
 func (m *MonitorController) RestGetStatus() {
 	output := make(map[string]string)
+
+	_, port1 := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:21000 | awk '{print $8 $9 $10}'")
+	_, port2UDP := lib.RunCommand("lsof -iUDP -P -n | grep *:21000 | awk '{print $8 $9 $10}'")
+	_, port2TCP := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:22000 | awk '{print $8 $9 $10}'")
+	_, port3 := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:9000 | awk '{print $8 $9 $10}'")
+
+	if port1 != ""  {
+		output["port21000"] = "up"
+	} else {
+		output["port21000"] = "down"
+	}
+
+	if port2UDP != "" && port2TCP != "" {
+		output["port22000"] = "up"
+	} else {
+		output["port22000"] = "down"
+	}
+
+	if port3 != "" {
+		output["port9000"] = "up"
+	} else {
+		output["port9000"] = "down"
+	}
+
 	output["status"] = "ok"
 	m.Data["json"] = &output
 	m.ServeJSON()
