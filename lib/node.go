@@ -141,7 +141,7 @@ func GetLog() (ok bool, data string) {
 // Get current Version of the monitor
 func CurrentMonitorVersion() (ok bool, version string) {
 	// ok, version = RunCommand(homeDir + "/alastria-node/scripts/monitor.sh latest")
-	ok, version = RunCommand("cd " + homeDir + "/alastria/workspace/src/github.com/alastria/monitor && git tag")
+	ok, version = RunCommand("cd " + homeDir + "/alastria/workspace/src/github.com/alastria/monitor && git describe --tags")
 	return
 }
 
@@ -202,7 +202,7 @@ func LastNodeRestart() (ok bool, salida string) {
 
 //Node/Geth/Quorum Version
 func NodeVersion() (ok bool, salida string) {
-	ok, salida = RunCommand("geth version | grep geth")
+	ok, salida = RunCommand("geth version | grep Quorum")
 	return
 }
 
