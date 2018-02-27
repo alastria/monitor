@@ -21,6 +21,9 @@ const status = "/v1/monitor/status"
 // URI to logjson message
 const logsjson = "/v1/node/logsjson"
 
+const proposeURI = "/v1/node/propose"
+const coinbaseURI = "/v1/node/coinbase"
+
 var apppath string
 var err error
 var log *logs.BeeLogger
@@ -88,12 +91,16 @@ type StatusReturn struct {
 	Status string `json: "status"`
 }
 
+type CoinbaseReturn struct {
+	Coinbase string `json: "coinbase"`
+}
 type NodeServices struct {
-	nodos   []Nodo
-	cert    tls.Certificate
-	visited map[string]bool
-	set     map[string]*Nodo
-	all     map[string]*Nodo
+	nodos      []Nodo
+	validators []Nodo
+	cert       tls.Certificate
+	visited    map[string]bool
+	set        map[string]*Nodo
+	all        map[string]*Nodo
 }
 
 func init() {
@@ -107,6 +114,7 @@ func NewNodeServices(feature string) (node *NodeServices) {
 	node = new(NodeServices)
 	nd := node.GetValidatorDirectory("https://raw.githubusercontent.com/alastria/alastria-node/feature/" + feature + "/DIRECTORY_VALIDATOR.md")
 	for cont := 0; cont < len(nd); cont++ {
+		node.validators = append(node.nodos, nd[cont])
 		node.nodos = append(node.nodos, nd[cont])
 	}
 	nd = node.GetGeneralDirectory("https://raw.githubusercontent.com/alastria/alastria-node/feature/" + feature + "/DIRECTORY_REGULAR.md")
@@ -148,7 +156,7 @@ func (n *NodeServices) call(ip string, uri string) (response string, err error) 
 }
 
 // uri example: /v1/monitor/status
-func (n *NodeServices) callJSON(response interface{}, ip string, uri string) (err error) {
+func (n *NodeServices) getJSON(response interface{}, ip string, uri string) (err error) {
 	// https://beego.me/docs/module/httplib.md
 
 	//log.SetFlags(log.Lshortfile)
@@ -292,12 +300,89 @@ func (n *NodeServices) peersVerify(nodo *Nodo) {
 func (n *NodeServices) IsUpAndRunning(nodo Nodo) (ok bool) {
 	var retorno StatusReturn
 	ok = false
-	err := n.callJSON(&retorno, nodo.IP, status)
+	err := n.getJSON(&retorno, nodo.IP, status)
 	if err == nil {
 		ok = retorno.Status == "ok"
 	}
 	return
 }
+
+func (n *NodeServices) ProposeSingleNode(nodo Nodo, address string) (ok bool) {
+
+	req := httplib.Post("https://" + nodo.IP + ":8443" + proposeURI)
+	req.Param("Candidate", address)
+	req.Param("Value", "true")
+
+	req.SetTLSClientConfig(&tls.Config{
+		InsecureSkipVerify: true,
+		Certificates:       []tls.Certificate{n.cert},
+	})
+	var retorno StatusReturn
+	ok = false
+
+	err = req.Debug(true).ToJSON(&retorno)
+
+	if err == nil {
+		ok = retorno.Status == "ok"
+	}
+	return
+}
+
+func (n *NodeServices) ProposeNodes() (ok bool) {
+
+	for cont := 0; cont < len(n.validators); cont++ {
+		coinbase := n.GetCoinbase(n.validators[cont])
+		log.Trace(coinbase)
+		for cont2 := 0; cont2 < len(n.validators); cont2++ {
+			nodo := n.validators[cont2]
+			log.Trace("Proposing in node %s", nodo.IP)
+			if n.validators[cont].IP != n.validators[cont2].IP {
+				//TODO: Check that every propose was successful
+				n.ProposeSingleNode(nodo, coinbase)
+			}
+		}
+	}
+
+	return
+}
+
+func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
+
+	req := httplib.Get("https://" + nodo.IP + ":8443" + coinbaseURI)
+
+	req.SetTLSClientConfig(&tls.Config{
+		InsecureSkipVerify: true,
+		Certificates:       []tls.Certificate{n.cert},
+	})
+	var retorno CoinbaseReturn
+	coinbase = "false"
+
+	err = req.Debug(true).ToJSON(&retorno)
+
+	if err == nil {
+		coinbase = retorno.Coinbase
+	}
+	return
+}
+
+// func (n *NodeServices) ProposeNodes() (nodo Nodo, err error) {
+// 	var ok bool = false
+// 	var cont int = 0
+// 	var nodos := n.GetValidatorDirectory()
+// 	for cont < len(n.nodos) {
+// 		nodo = n.nodos[cont]
+// 		// is validator
+// 		if nodo.PrivateFor == "" && n.IsUpAndRunning(nodo) {
+// 			ok = true
+// 		} else {
+// 			cont++
+// 		}
+// 	}
+// 	if !ok {
+// 		err = errors.New("No se ha encontrado ningún monitor en ningún nodo validador.")
+// 	}
+// 	return
+// }
 
 func (n *NodeServices) GetFirstValidatorUp() (nodo Nodo, err error) {
 	var ok bool = false

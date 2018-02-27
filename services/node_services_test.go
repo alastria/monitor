@@ -9,6 +9,7 @@ import (
 	"text/template"
 
 	"github.com/astaxie/beego"
+	// "github.com/ethereum/go-ethereum/log"
 	. "github.com/smartystreets/goconvey/convey"
 )
 
@@ -110,4 +111,17 @@ platform@alastria.io
 			So(incidencias, ShouldNotBeNil)
 		})
 	})
+}
+
+// >> /home/arocha/go/bin/go test -timeout 30s github.com/alastria/monitor/services -run ^TestProposeValidators$
+func TestProposeValidators(t *testing.T) {
+	nodeService := NewNodeServices("ibft")
+	result := nodeService.ProposeNodes()
+	Convey("Connection: Propose should finish completely\n", t, func() {
+		Convey("Result don't must be empty", func() {
+			So(nodos, ShouldNotBeNil)
+		})
+		Convey("Result must be OK", func() {
+			So(result, ShouldBeEqual, "true")
+		})
 }

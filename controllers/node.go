@@ -160,7 +160,7 @@ func (m *NodeController) Coinbase() {
 	output := make(map[string]string)
 	ok, data := lib.GetCoinbase()
 	if ok {
-		output["data"] = data
+		output["coinbase"] = data
 	} else {
 		output["status"] = "error occurred"
 	}

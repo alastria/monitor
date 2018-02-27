@@ -8,3 +8,4 @@ nohup.out
 /vendor/
 glide.lock
 fabric8-analytics.log
+services/conf
