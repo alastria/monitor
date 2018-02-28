@@ -119,9 +119,10 @@ func TestProposeValidators(t *testing.T) {
 	result := nodeService.ProposeNodes()
 	Convey("Connection: Propose should finish completely\n", t, func() {
 		Convey("Result don't must be empty", func() {
-			So(nodos, ShouldNotBeNil)
+			So(result, ShouldNotBeNil)
 		})
 		Convey("Result must be OK", func() {
-			So(result, ShouldBeEqual, "true")
+			So(result, ShouldEqual, "true")
 		})
+	})
 }

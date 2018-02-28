@@ -332,7 +332,7 @@ func (n *NodeServices) ProposeNodes() (ok bool) {
 
 	for cont := 0; cont < len(n.validators); cont++ {
 		coinbase := n.GetCoinbase(n.validators[cont])
-		log.Trace(coinbase)
+		log.Trace("Proposing node %s (cb: %s)", n.validators[cont].IP, coinbase)
 		for cont2 := 0; cont2 < len(n.validators); cont2++ {
 			nodo := n.validators[cont2]
 			log.Trace("Proposing in node %s", nodo.IP)
@@ -349,6 +349,7 @@ func (n *NodeServices) ProposeNodes() (ok bool) {
 func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 
 	req := httplib.Get("https://" + nodo.IP + ":8443" + coinbaseURI)
+	log.Trace("Requesting coinbase at: %s", ("https://" + nodo.IP + ":8443" + coinbaseURI))
 
 	req.SetTLSClientConfig(&tls.Config{
 		InsecureSkipVerify: true,
@@ -361,6 +362,7 @@ func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 
 	if err == nil {
 		coinbase = retorno.Coinbase
+		log.Trace("Coinbase obtained in GET %s", coinbase)
 	}
 	return
 }
