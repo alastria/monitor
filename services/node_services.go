@@ -330,15 +330,23 @@ func (n *NodeServices) ProposeSingleNode(nodo Nodo, address string) (ok bool) {
 
 func (n *NodeServices) ProposeNodes() (ok bool) {
 
-	for cont := 0; cont < len(n.validators); cont++ {
-		coinbase := n.GetCoinbase(n.validators[cont])
-		log.Trace("Proposing node %s (cb: %s)", n.validators[cont].IP, coinbase)
-		for cont2 := 0; cont2 < len(n.validators); cont2++ {
-			nodo := n.validators[cont2]
-			log.Trace("Proposing in node %s", nodo.IP)
-			if n.validators[cont].IP != n.validators[cont2].IP {
-				//TODO: Check that every propose was successful
-				n.ProposeSingleNode(nodo, coinbase)
+	n.visited, n.all = n.getSets()
+	nodo, err := n.GetFirstValidatorUp()
+	n.set = make(map[string]*Nodo)
+	if err == nil {
+		n.set[nodo.Enode] = &nodo
+		for len(n.set) > 0 {
+			for enode := range n.set {
+				coinbase := n.GetCoinbase(*n.set[enode])
+				log.Trace("Proposing node %s (cb: %s)", (*n.set[enode]).IP, coinbase)
+				for enode2 := range n.set {
+					nodo := *n.set[enode2]
+					log.Trace("Proposing in node %s", nodo.IP)
+					if (*n.set[enode]).IP != (*n.set[enode2]).IP {
+						//TODO: Check that every propose was successful
+						n.ProposeSingleNode(nodo, coinbase)
+					}
+				}
 			}
 		}
 	}
