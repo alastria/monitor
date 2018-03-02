@@ -116,6 +116,12 @@ platform@alastria.io
 // >> /home/arocha/go/bin/go test -timeout 30s github.com/alastria/monitor/services -run ^TestProposeValidators$
 func TestProposeValidators(t *testing.T) {
 	nodeService := NewNodeServices("ibft")
+	// log.Info("Verificando la lista de nodos:")
+	// for cont := 0; cont < len(nodeService.nodos); cont++ {
+	// 	nodo := nodeService.nodos[cont]
+	// 	log.Info("Entidad: %s, Contactos: %s, Enode: %s, IP: %s",
+	// 		nodo.Entidad, nodo.Contactos, nodo.Enode, nodo.IP)
+	// }
 	result := nodeService.ProposeNodes()
 	Convey("Connection: Propose should finish completely\n", t, func() {
 		Convey("Result don't must be empty", func() {

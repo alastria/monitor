@@ -92,7 +92,7 @@ type StatusReturn struct {
 }
 
 type CoinbaseReturn struct {
-	Coinbase string `json: "coinbase"`
+	Data string `json: "data"`
 }
 type NodeServices struct {
 	nodos      []Nodo
@@ -354,6 +354,39 @@ func (n *NodeServices) ProposeNodes() (ok bool) {
 	return
 }
 
+// n.visited, n.all = n.getSets()
+// 	nodo, err := n.GetFirstValidatorUp()
+// 	n.set = make(map[string]*Nodo)
+// 	if err == nil {
+// 		n.set[nodo.Enode] = &nodo
+// 		for len(n.set) > 0 {
+// 			for enode := range n.set {
+// 				log.Trace("Comenzando a verificar el nodo: %s.", n.set[enode].Entidad)
+// 				aux := n.set[enode]
+// 				n.nodeVerify(aux)
+// 				if len(aux.Incidencias) > 0 {
+// 					log.Trace("Detectada una incidencia en el nodo.")
+// 				}
+// 			}
+// 		}
+// 	}
+
+// 	log.Trace("Recopilando las incidencias.")
+// 	fecha := time.Now()
+// 	for key := range n.all {
+// 		aux := n.all[key]
+// 		aux.LastUpdate = fecha
+// 		if !n.visited[key] {
+// 			log.Trace("Parece que el nodo está fuera de línea. %s", aux)
+// 			aux.Incidencias += "\n [*] Parece que el nodo está fuera de línea."
+// 		}
+// 		if len(aux.Incidencias) > 0 {
+// 			problems = append(problems, *aux)
+// 		}
+// 	}
+// 	return
+// }
+
 func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 
 	req := httplib.Get("https://" + nodo.IP + ":8443" + coinbaseURI)
@@ -369,7 +402,7 @@ func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 	err = req.Debug(true).ToJSON(&retorno)
 
 	if err == nil {
-		coinbase = retorno.Coinbase
+		coinbase = retorno.Data
 		log.Trace("Coinbase obtained in GET %s", coinbase)
 	}
 	return
