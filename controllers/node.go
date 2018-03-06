@@ -66,6 +66,23 @@ func (m *NodeController) CleanStartNode() {
 	m.ServeJSON()
 }
 
+// @Title TransactionsClean
+// @Description Cleans the transaction queue from the node
+// @Success 200 {status} string
+// @Failure 403 : error
+// @router /cleantransactions [get]
+func (m *NodeController) TransactionsClean() {
+	output := make(map[string]string)
+	if lib.CleanTransactions() {
+		output["status"] = "ok"
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
 // @Title StopNode
 // @Description Stops the Alastria node
 // @Success 200 {status} string

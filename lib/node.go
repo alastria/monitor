@@ -99,6 +99,12 @@ func CleanStart() (ok bool) {
 	return
 }
 
+// Clean transactions and restart nodes
+func CleanTransactions() (ok bool) {
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/clean.sh transactions")
+	return
+}
+
 // Update config files and restart an Alastria node
 func Update() bool {
 	var err error
