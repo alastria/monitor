@@ -169,6 +169,24 @@ func (m *NodeController) Coinbase() {
 	m.ServeJSON()
 }
 
+// @Title MineStart
+// @Description If the node is not mining start the miner
+// @Success 200 {status} mining
+// @Failure 403 : error
+// @router /mine [get]
+func (m *NodeController) MineStart() {
+	output := make(map[string]string)
+	ok := lib.StartMining()
+	if ok {
+		output["status"] = "ok"
+	} else {
+		output["status"] = "error occurred"
+	}
+
+	m.Data["json"] = &output
+	m.ServeJSON()
+}
+
 // @Title getLogs
 // @Description Get logs for the node
 // @Success 200 {status} logData

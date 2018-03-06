@@ -183,6 +183,16 @@ func GetCoinbase() (ok bool, data string) {
 	return
 }
 
+// If the node is not mining it starts mining
+func StartMining() (ok bool) {
+	ok, mining := RunCommand("geth --exec 'eth.mining' attach http://localhost:22000")
+	if ok && mining != "true" {
+		cmdStr := "geth --exec 'miner.start()' attach http://localhost:22000"
+		ok, _ = RunCommand(cmdStr)
+	}
+	return
+}
+
 // Non-returning Update function for its use in CRON
 func UpdateCron() {
 	Update()
