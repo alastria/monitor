@@ -1,2 +1,2 @@
 #!/bin/sh
-bee run -downdoc=true -gendoc=true
+nohup bee run -vendor=true -downdoc=true -gendoc=true
