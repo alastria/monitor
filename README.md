@@ -73,5 +73,5 @@ the node and reinitializes it for the new test-net conditions.
 repository if they are outdated
 * `/node/version [GET]`: Checks the current version of the node
 * `/node/get/coinbase [GET]`: Checks the nodes coinbase
-* `/node/clean/transactions [GET]`: Cleans the transaction queue of the node
+* `/node/clean/transactions [DELETE]`: Cleans the transaction queue of the node
 * `/node/mine [GET]`: Checks if the node is mining and, if this is not the case, it starts the miner
