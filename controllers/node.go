@@ -16,9 +16,9 @@ type NodeController struct {
 
 // @Title UpdateFiles
 // @Description Updates files and restart node
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /update [get]
+// @router /update [post]
 func (m *NodeController) UpdateFiles() {
 	output := make(map[string]string)
 
@@ -34,9 +34,9 @@ func (m *NodeController) UpdateFiles() {
 
 // @Title StartNode
 // @Description Starts the Alastria node
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /start [get]
+// @router /start/default [get]
 func (m *NodeController) StartNode() {
 	output := make(map[string]string)
 	if lib.Start() {
@@ -51,9 +51,9 @@ func (m *NodeController) StartNode() {
 
 // @Title CleanStartNode
 // @Description Starts the Alastria node clean
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /cleanstart [get]
+// @router /start/clean [get]
 func (m *NodeController) CleanStartNode() {
 	output := make(map[string]string)
 	if lib.CleanStart() {
@@ -68,9 +68,9 @@ func (m *NodeController) CleanStartNode() {
 
 // @Title TransactionsClean
 // @Description Cleans the transaction queue from the node
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /cleantransactions [get]
+// @router /transactions [delete]
 func (m *NodeController) TransactionsClean() {
 	output := make(map[string]string)
 	if lib.CleanTransactions() {
@@ -85,9 +85,9 @@ func (m *NodeController) TransactionsClean() {
 
 // @Title StopNode
 // @Description Stops the Alastria node
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /stop [get]
+// @router /stop [post]
 func (m *NodeController) StopNode() {
 	output := make(map[string]string)
 	if lib.Stop() {
@@ -102,9 +102,9 @@ func (m *NodeController) StopNode() {
 
 // @Title restartNode
 // @Description Restarts Alastria node
-// @Success 200 {status} string
+// @Success 202 {status} string
 // @Failure 403 : error
-// @router /restart [get]
+// @router /restart [post]
 func (m *NodeController) RestartNode() {
 	output := make(map[string]string)
 	if lib.Restart() {
@@ -137,7 +137,7 @@ func (m *NodeController) StatusNode() {
 // @Title ProposeCandidate
 // @Description Propose new validator candidate
 // @Param	body		body 	models.ProposeReq	true		"Propose a new candidate"
-// @Success 200  {status} string
+// @Success 202  {status} string
 // @Failure 403 error in propose
 // @router /propose [post]
 func (m *NodeController) ProposeCandidate() {
@@ -154,9 +154,9 @@ func (m *NodeController) ProposeCandidate() {
 // @Title NodeRestartNetwork
 // @Description Restart complete network for the node
 // @Param	body		body 	models.RestartNetReq	true		"Restart the whole network"
-// @Success 200  {status} string
+// @Success 202  {status} string
 // @Failure 403 error in restart
-// @router /restartNetwork [post]
+// @router /network/restart [post]
 func (m *NodeController) NodeRestartNetwork() {
 	var r models.RestartNetReq
 	json.Unmarshal(m.Ctx.Input.RequestBody, &r)
@@ -188,9 +188,9 @@ func (m *NodeController) Coinbase() {
 
 // @Title MineStart
 // @Description If the node is not mining start the miner
-// @Success 200 {status} mining
+// @Success 202 {status} mining
 // @Failure 403 : error
-// @router /mine [get]
+// @router /ismining [post]
 func (m *NodeController) MineStart() {
 	output := make(map[string]string)
 	ok := lib.StartMining()
@@ -208,7 +208,7 @@ func (m *NodeController) MineStart() {
 // @Description Get logs for the node
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /logsraw [get]
+// @router /log/raw [get]
 func (m *NodeController) GetLogs() {
 	output := make(map[string]string)
 	ok, data := lib.GetLog()
@@ -245,7 +245,7 @@ func (m *NodeController) GetVersion() {
 // @Description Date/Hour of latest restart of the node
 // @Success 200 {status} Status {date} lastUpdate
 // @Failure 403 : error
-// @router /lastrestart [get]
+// @router /start/latest [get]
 func (m *NodeController) NodeLastRestart() {
 	output := make(map[string]string)
 	ok, data := lib.LastNodeRestart()
@@ -264,7 +264,7 @@ func (m *NodeController) NodeLastRestart() {
 // @Description Get logs with a fancy formatted JSON
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /logsjson [get]
+// @router /log/json [get]
 func (m *NodeController) GetLogsJson() {
 	output := make(map[string]string)
 
@@ -311,7 +311,7 @@ func (m *NodeController) GetLogsJson() {
 // @Description Get Istanbul related logs with a fancy formatted JSON
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /logistanbul [get]
+// @router /log/istanbul [get]
 func (m *NodeController) GetIstanbulLog() {
 	output := make(map[string]string)
 

@@ -41,7 +41,7 @@ func (m *MonitorController) RestGetStatus() {
 	_, port2TCP := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:22000 | awk '{print $8 $9 $10}'")
 	_, port3 := lib.RunCommand("lsof -iTCP -sTCP:LISTEN -P -n | grep *:9000 | awk '{print $8 $9 $10}'")
 
-	if port1 != ""  {
+	if port1 != "" {
 		output["port21000"] = "up"
 	} else {
 		output["port21000"] = "down"
@@ -86,9 +86,9 @@ func (m *MonitorController) GetVersion() {
 
 // @Title GetVersionUpdate
 // @Description Check monitor version
-// @Success 200 {status, version} string Status (latest | updated)
+// @Success 202 {status, version} string Status (latest | updated)
 // @Failure 403 : overload
-// @router /versionupdate [get]
+// @router /update [post]
 func (m *MonitorController) GetVersionUpdate() {
 	output := make(map[string]string)
 	_, current := lib.CurrentMonitorVersion()
