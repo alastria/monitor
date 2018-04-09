@@ -6,6 +6,8 @@ import (
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"sort"
+	"strconv"
 	"strings"
 	"time"
 
@@ -33,6 +35,9 @@ var regulars = regexp.MustCompile(`\| *(.*) *\| *(.*) *\| *.* *\| *(.*=) *\| *en
 var emails = regexp.MustCompile(`[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}`)
 var nodeInfo_reg = regexp.MustCompile(`nodeInfo.*id\: \\"([a-z0-9]*)\\".*name: \\"([A-Za-z\/\.\-0-9]*)\\"`)
 var peer_reg = regexp.MustCompile(`{\\n *caps: \[\\"istanbul\/64\\"],\\n +id: \\"([a-z0-9]*)\\",\\n +name: \\"([A-Za-z\/\.\-0-9]*)\\",\\n +network: {\\n +localAddress: \\"[0-9\.:]*\\",\\n +remoteAddress: \\"([0-9\.]*):[0-9]+\\"\\n +},\\n +protocols: {\\n +istanbul: {\\n +difficulty: [0-9]*,\\n +head: \\"[0-9a-z]*\\",\\n +version: [0-9]+\\n +}\\n +}\\n}`)
+var coinbase = regexp.MustCompile(`.*\"coinbase\": \"\\\"(.*)\\\"\\n\",`)
+var getvalidators = regexp.MustCompile(`.*\"getValidators\": \"\[(.*)\]`)
+var eachvalidator = regexp.MustCompile(`\\\"([0-9a-zA-Z]+)\\\",*`)
 
 type Nodo struct {
 	Entidad     string    `json: "entidad"`
@@ -41,8 +46,10 @@ type Nodo struct {
 	IP          string    `json: "ip"`
 	Port        string    `json: "port"`
 	PrivateFor  string    `json: "privateFor"`
+	Coinbase    string    `json: "coinbase"`
 	Monitor     string    `json: "monitor"`
-	peers       []Peer    `json: "peers"`
+	Peers       []Peer    `json: "peers"`
+	Validators  []string  `json: "validators"`
 	Incidencias string    `json: "incidencias"`
 	LastUpdate  time.Time `json: "lastUpdate"`
 }
@@ -257,6 +264,8 @@ func (n *NodeServices) nodeVerify(nodo *Nodo) {
 			nodo.Monitor = json
 			n.nodeInfoVerify(nodo)
 			n.peersVerify(nodo)
+			n.ibftExtraction(nodo)
+			n.all[nodo.Enode] = nodo
 		}
 	} else {
 		log.Trace("Parece que el monitor no está disponible. %s", nodo)
@@ -276,6 +285,23 @@ func (n *NodeServices) nodeInfoVerify(nodo *Nodo) {
 	}*/
 }
 
+func (n *NodeServices) ibftExtraction(nodo *Nodo) {
+	if len(nodo.PrivateFor) == 0 && len(nodo.Coinbase) == 0 {
+		coinbases := coinbase.FindAllStringSubmatch(nodo.Monitor, -1)
+		if coinbases[0][1] != nodo.Coinbase {
+			nodo.Coinbase = coinbases[0][1]
+		}
+		ibftgetvalidators := getvalidators.FindAllStringSubmatch(nodo.Monitor, -1)
+		if len(ibftgetvalidators[0][1]) > 0 {
+			ibftvalidators := eachvalidator.FindAllStringSubmatch(ibftgetvalidators[0][1], -1)
+			for cont := 0; cont < len(ibftvalidators); cont++ {
+				nodo.Validators = append(nodo.Validators, ibftvalidators[cont][1])
+			}
+			sort.Strings(nodo.Validators)
+		}
+	}
+}
+
 func (n *NodeServices) peersVerify(nodo *Nodo) {
 	peers := peer_reg.FindAllStringSubmatch(nodo.Monitor, -1)
 	for cont := 0; cont < len(peers); cont++ {
@@ -285,13 +311,13 @@ func (n *NodeServices) peersVerify(nodo *Nodo) {
 		aux.Name = peer[2]
 		aux.Network = PeerNetwork{}
 		aux.Network.RemoteAddress = peer[3]
-		nodo.peers = append(nodo.peers, aux)
+		nodo.Peers = append(nodo.Peers, aux)
 		if aux, ok := n.all[peer[1]]; ok {
 			if !n.visited[aux.Enode] {
 				n.set[aux.Enode] = aux
 			}
 		} else {
-			log.Trace("El enode "+peer[1]+", no es conocido. %s", nodo)
+			log.Trace("El enode "+peer[1]+", no es conocido. %s - %s.", nodo.Entidad, nodo.Enode)
 			nodo.Incidencias += "\n [*] El enode " + peer[1] + ", no es conocido."
 		}
 	}
@@ -307,16 +333,22 @@ func (n *NodeServices) IsUpAndRunning(nodo Nodo) (ok bool) {
 	return
 }
 
-func (n *NodeServices) ProposeSingleNode(nodo Nodo, address string) (ok bool) {
+type proposeForm struct {
+	Candidate string
+	Value     string
+}
+
+func (n *NodeServices) ProposeSingleNode(nodo *Nodo, address string, value bool) (ok bool) {
+
+	log.Info("Entidad: %s -  %s: propose(%s, %s)", nodo.Entidad, nodo.Coinbase, address, value)
 
 	req := httplib.Post("https://" + nodo.IP + ":8443" + proposeURI)
-	req.Param("Candidate", address)
-	req.Param("Value", "true")
 
 	req.SetTLSClientConfig(&tls.Config{
 		InsecureSkipVerify: true,
 		Certificates:       []tls.Certificate{n.cert},
 	})
+	req.JSONBody(proposeForm{address, strconv.FormatBool(value)})
 	var retorno StatusReturn
 	ok = false
 
@@ -328,64 +360,38 @@ func (n *NodeServices) ProposeSingleNode(nodo Nodo, address string) (ok bool) {
 	return
 }
 
-func (n *NodeServices) ProposeNodes() (ok bool) {
+func (n *NodeServices) ListValidators() (validators []*Nodo) {
+	for key := range n.all {
+		aux := n.all[key]
 
-	n.visited, n.all = n.getSets()
-	nodo, err := n.GetFirstValidatorUp()
-	n.set = make(map[string]*Nodo)
-	if err == nil {
-		n.set[nodo.Enode] = &nodo
-		for len(n.set) > 0 {
-			for enode := range n.set {
-				coinbase := n.GetCoinbase(*n.set[enode])
-				log.Trace("Proposing node %s (cb: %s)", (*n.set[enode]).IP, coinbase)
-				for enode2 := range n.set {
-					nodo := *n.set[enode2]
-					log.Trace("Proposing in node %s", nodo.IP)
-					if (*n.set[enode]).IP != (*n.set[enode2]).IP {
-						//TODO: Check that every propose was successful
-						n.ProposeSingleNode(nodo, coinbase)
-					}
-				}
+		if n.visited[key] && len(aux.Coinbase) > 0 {
+
+			i := sort.SearchStrings(aux.Validators, aux.Coinbase)
+
+			if i < len(aux.Validators) && aux.Validators[i] == aux.Coinbase {
+				validators = append(validators, aux)
+				log.Info("Validator: %s: %s - %s", aux.Entidad, aux.Coinbase, aux.Validators)
 			}
+		}
+	}
+	return
+}
+
+func (n *NodeServices) ProposeNodes(iskey string) (ok bool) {
+	validators := n.ListValidators()
+	for key := range validators {
+		aux := validators[key]
+
+		i := sort.SearchStrings(aux.Validators, iskey)
+		proposal := !(i < len(aux.Validators) && aux.Validators[i] == iskey)
+
+		if iskey != aux.Coinbase {
+			ok = ok || n.ProposeSingleNode(aux, iskey, proposal)
 		}
 	}
 
 	return
 }
-
-// n.visited, n.all = n.getSets()
-// 	nodo, err := n.GetFirstValidatorUp()
-// 	n.set = make(map[string]*Nodo)
-// 	if err == nil {
-// 		n.set[nodo.Enode] = &nodo
-// 		for len(n.set) > 0 {
-// 			for enode := range n.set {
-// 				log.Trace("Comenzando a verificar el nodo: %s.", n.set[enode].Entidad)
-// 				aux := n.set[enode]
-// 				n.nodeVerify(aux)
-// 				if len(aux.Incidencias) > 0 {
-// 					log.Trace("Detectada una incidencia en el nodo.")
-// 				}
-// 			}
-// 		}
-// 	}
-
-// 	log.Trace("Recopilando las incidencias.")
-// 	fecha := time.Now()
-// 	for key := range n.all {
-// 		aux := n.all[key]
-// 		aux.LastUpdate = fecha
-// 		if !n.visited[key] {
-// 			log.Trace("Parece que el nodo está fuera de línea. %s", aux)
-// 			aux.Incidencias += "\n [*] Parece que el nodo está fuera de línea."
-// 		}
-// 		if len(aux.Incidencias) > 0 {
-// 			problems = append(problems, *aux)
-// 		}
-// 	}
-// 	return
-// }
 
 func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 
@@ -407,25 +413,6 @@ func (n *NodeServices) GetCoinbase(nodo Nodo) (coinbase string) {
 	}
 	return
 }
-
-// func (n *NodeServices) ProposeNodes() (nodo Nodo, err error) {
-// 	var ok bool = false
-// 	var cont int = 0
-// 	var nodos := n.GetValidatorDirectory()
-// 	for cont < len(n.nodos) {
-// 		nodo = n.nodos[cont]
-// 		// is validator
-// 		if nodo.PrivateFor == "" && n.IsUpAndRunning(nodo) {
-// 			ok = true
-// 		} else {
-// 			cont++
-// 		}
-// 	}
-// 	if !ok {
-// 		err = errors.New("No se ha encontrado ningún monitor en ningún nodo validador.")
-// 	}
-// 	return
-// }
 
 func (n *NodeServices) GetFirstValidatorUp() (nodo Nodo, err error) {
 	var ok bool = false
@@ -453,6 +440,23 @@ func (n *NodeServices) getSets() (visited map[string]bool, set map[string]*Nodo)
 		var tmp = n.nodos[cont]
 		set[tmp.Enode] = &tmp
 		visited[tmp.Enode] = false
+	}
+	return
+}
+
+func (n *NodeServices) Calls(ips []string, uris []string) (err error) {
+	var uri string
+	var ip string
+	for contUri := 0; contUri < len(uris); contUri++ {
+		uri = uris[contUri]
+		for contIp := 0; contIp < len(ips); contIp++ {
+			ip = ips[contIp]
+			_, err = n.call(ip, uri)
+			if err != nil {
+				contUri = len(uris)
+				contIp = len(ips)
+			}
+		}
 	}
 	return
 }

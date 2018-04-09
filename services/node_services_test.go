@@ -114,21 +114,49 @@ platform@alastria.io
 }
 
 // >> /home/arocha/go/bin/go test -timeout 30s github.com/alastria/monitor/services -run ^TestProposeValidators$
+/*
+Indra: 0x59d9f63451811c2c3c287be40a2206d201dc3bff
+Everis: 0xd4e6453afcfbfc8c61d53b71fddcc484e14f45e0
+CaixaBank: 0xa49ddde59f9c521be81297a4c49697a5497063b3
+Alastria: 0xb87dc349944cc47474775dde627a8a171fc94532
+Grant Thornton: 0xc18d744dd6d06f18b79544566d01dfa881d3626c
+Santander: 0x7986c3fdb87a2149975d8fa2c1d65401da6b3399
+Repsol: 0xf10067b13018211e17e880030dd2c38f1cdcb97
+*/
 func TestProposeValidators(t *testing.T) {
 	nodeService := NewNodeServices("ibft")
-	// log.Info("Verificando la lista de nodos:")
-	// for cont := 0; cont < len(nodeService.nodos); cont++ {
-	// 	nodo := nodeService.nodos[cont]
-	// 	log.Info("Entidad: %s, Contactos: %s, Enode: %s, IP: %s",
-	// 		nodo.Entidad, nodo.Contactos, nodo.Enode, nodo.IP)
-	// }
-	result := nodeService.ProposeNodes()
+	log.Debug("Incidencias: %s", nodeService.CheckPermission())
+	//log.Debug("Validadores: %s", nodeService.ListValidators())
+	result := nodeService.ProposeNodes("0xc18d744dd6d06f18b79544566d01dfa881d3626c")
 	Convey("Connection: Propose should finish completely\n", t, func() {
 		Convey("Result don't must be empty", func() {
 			So(result, ShouldNotBeNil)
 		})
 		Convey("Result must be OK", func() {
-			So(result, ShouldEqual, "true")
+			So(result, ShouldEqual, true)
 		})
 	})
 }
+
+/*
+func TestCalls(t *testing.T) {
+	nodeService := NewNodeServices("ibft")
+
+	//stop := "/v1/node/stop"
+	//versionupdate := "/v1/monitor/versionupdate"
+	update := "/v1/node/update"
+	//start := "/v1/node/start"
+	var nodos []string = ["/v1/node/update"]
+	var uris  []string = []
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+	nodos = append(nodos, "")
+
+	err := nodeService.Calls(nodos, uris)
+
+}*/
