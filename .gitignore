@@ -9,3 +9,5 @@ nohup.out
 glide.lock
 fabric8-analytics.log
 services/conf
+.vscode/launch.json
+services/debug.test
