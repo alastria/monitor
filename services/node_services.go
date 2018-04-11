@@ -19,12 +19,15 @@ import (
 
 // URI to status message
 const status = "/v1/monitor/status"
+const versionupdate = "/v1/monitor/versionupdate"
 
 // URI to logjson message
 const logsjson = "/v1/node/logsjson"
 
 const proposeURI = "/v1/node/propose"
 const coinbaseURI = "/v1/node/coinbase"
+
+const update = "/v1/node/update"
 
 var apppath string
 var err error
@@ -401,6 +404,28 @@ func (n *NodeServices) ProposeNodes(iskey string) (ok bool) {
 		}
 	}
 
+	return
+}
+
+func (n *NodeServices) VersionUpdate() (ok bool) {
+	for key := range n.all {
+		aux := n.all[key]
+
+		if n.visited[key] {
+			n.call(aux.IP, versionupdate)
+		}
+	}
+	return
+}
+
+func (n *NodeServices) Update() (ok bool) {
+	for key := range n.all {
+		aux := n.all[key]
+
+		if n.visited[key] {
+			n.call(aux.IP, update)
+		}
+	}
 	return
 }
 

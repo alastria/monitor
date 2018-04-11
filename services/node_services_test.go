@@ -161,6 +161,22 @@ func TestListVolunteers(t *testing.T) {
 	return
 }
 
+// Actualizar la versión del monitor en todos los nodos
+func TestVersionUpdate(t *testing.T) {
+	nodeService := NewNodeServices("ibft")
+	log.Debug("Incidencias: %s", nodeService.CheckPermission())
+	nodeService.VersionUpdate()
+	return
+}
+
+// Actualizar los ficheros de permisionado en todos los nodos
+func TestUpdate(t *testing.T) {
+	nodeService := NewNodeServices("ibft")
+	log.Debug("Incidencias: %s", nodeService.CheckPermission())
+	nodeService.Update()
+	return
+}
+
 /*
 func TestCalls(t *testing.T) {
 	nodeService := NewNodeServices("ibft")
