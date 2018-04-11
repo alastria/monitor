@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 	"runtime"
+	"sort"
 	"testing"
 	"text/template"
 
@@ -113,21 +114,21 @@ platform@alastria.io
 	})
 }
 
-// >> /home/arocha/go/bin/go test -timeout 30s github.com/alastria/monitor/services -run ^TestProposeValidators$
+// go test -timeout 99999999s -run TestProposeValidators
 /*
-Indra: 0x59d9f63451811c2c3c287be40a2206d201dc3bff
+Indra: 0x59d9f63451811c2c3c287be40a2206d201dc3bff *
 Everis: 0xd4e6453afcfbfc8c61d53b71fddcc484e14f45e0
 CaixaBank: 0xa49ddde59f9c521be81297a4c49697a5497063b3
 Alastria: 0xb87dc349944cc47474775dde627a8a171fc94532
 Grant Thornton: 0xc18d744dd6d06f18b79544566d01dfa881d3626c
 Santander: 0x7986c3fdb87a2149975d8fa2c1d65401da6b3399
-Repsol: 0xf10067b13018211e17e880030dd2c38f1cdcb97
+Repsol: 0xf10067b13018211e17e880030dd2c38f1cdcb97 *
 */
 func TestProposeValidators(t *testing.T) {
 	nodeService := NewNodeServices("ibft")
 	log.Debug("Incidencias: %s", nodeService.CheckPermission())
 	//log.Debug("Validadores: %s", nodeService.ListValidators())
-	result := nodeService.ProposeNodes("0xc18d744dd6d06f18b79544566d01dfa881d3626c")
+	result := nodeService.ProposeNodes("0x986f2503001e238ade8f401ca0b0930dd9ba4563") // Change me for propose/unpropose a node
 	Convey("Connection: Propose should finish completely\n", t, func() {
 		Convey("Result don't must be empty", func() {
 			So(result, ShouldNotBeNil)
@@ -136,6 +137,28 @@ func TestProposeValidators(t *testing.T) {
 			So(result, ShouldEqual, true)
 		})
 	})
+}
+
+// go test -timeout 99999999s -run TestListVolunteers
+func TestListVolunteers(t *testing.T) {
+	nodeService := NewNodeServices("ibft")
+	log.Debug("Incidencias: %s", nodeService.CheckPermission())
+	volunteers := nodeService.ListVolunteers()
+	var activo string
+	for key := range volunteers {
+		aux := volunteers[key]
+
+		i := sort.SearchStrings(aux.Validators, aux.Coinbase)
+
+		if i < len(aux.Validators) && aux.Validators[i] == aux.Coinbase {
+			activo = "SI"
+		} else {
+			activo = "NO"
+		}
+
+		log.Info("%s[%s]: %s - %s", aux.Entidad, activo, aux.Coinbase, aux.Validators)
+	}
+	return
 }
 
 /*
