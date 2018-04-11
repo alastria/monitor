@@ -360,6 +360,17 @@ func (n *NodeServices) ProposeSingleNode(nodo *Nodo, address string, value bool)
 	return
 }
 
+func (n *NodeServices) ListVolunteers() (validators []*Nodo) {
+	for key := range n.all {
+		aux := n.all[key]
+
+		if n.visited[key] && len(aux.Coinbase) > 0 {
+			validators = append(validators, aux)
+		}
+	}
+	return
+}
+
 func (n *NodeServices) ListValidators() (validators []*Nodo) {
 	for key := range n.all {
 		aux := n.all[key]
@@ -385,8 +396,8 @@ func (n *NodeServices) ProposeNodes(iskey string) (ok bool) {
 		i := sort.SearchStrings(aux.Validators, iskey)
 		proposal := !(i < len(aux.Validators) && aux.Validators[i] == iskey)
 
-		if iskey != aux.Coinbase {
-			ok = ok || n.ProposeSingleNode(aux, iskey, proposal)
+		if strings.Compare(iskey, aux.Coinbase) != 0 {
+			ok = n.ProposeSingleNode(aux, iskey, proposal) || ok
 		}
 	}
 
