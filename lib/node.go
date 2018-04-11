@@ -5,7 +5,6 @@ import (
 	"fmt"
 	//	"math/big"
 	"encoding/hex"
-	"io"
 	"io/ioutil"
 	"math/rand"
 	"os"
@@ -108,9 +107,16 @@ func CleanTransactions() (ok bool) {
 // Update config files and restart an Alastria node
 func Update() bool {
 	var err error
+	var fichero []byte
 	RunCommand("cd " + homeDir + "/alastria-node && git pull")
 	// log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
 	stfile, static := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/static-nodes.json")
+	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/NODE_TYPE")
+	NODE_TYPE = string(fichero)
+	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/static-nodes.json")
+	STATIC = string(fichero)
+	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/permissioned-nodes.json")
+	PERMISSIONED = string(fichero)
 	pmfile, permissioned := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/permissioned-nodes_" + NODE_TYPE + ".json")
 	if strings.Compare(static, STATIC) != 0 || strings.Compare(permissioned, PERMISSIONED) != 0 {
 
@@ -128,8 +134,8 @@ func Update() bool {
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
 			// log.Trace("Hay que reiniciar el nodo...")
 			RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
-			time.Sleep(15000 * time.Millisecond)
-			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
+			time.Sleep(1000 * time.Millisecond)
+			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
 		}
 	}
 	if err != nil {
@@ -168,7 +174,7 @@ func RestartNetwork(nodeType string, nodeName string) (ok bool) {
 	_, _ = RunCommand("cd " + homeDir + "/alastria-node/ && git pull")
 	_, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 	ok1, _ := RunCommand("cd " + homeDir + "/alastria-node/scripts && ./init.sh backup " + nodeType + " " + nodeName)
-	ok2, _ := RunCommand(homeDir + "/alastria-node/scripts/start.sh clean")
+	ok2, _ := RunCommand(homeDir + "/alastria-node/scripts/start.sh")
 	if ok1 && ok2 {
 		return true
 	}
@@ -241,18 +247,7 @@ func GetFile(fichero string) (contenido string) {
 }
 
 func copy(stfrom, stto string) {
-	// log.Debug(stfrom, stto)
-	from, err := os.Open(stfrom)
-	if err != nil {
-		// log.Warn("copy: ", err)
-	}
-	defer from.Close()
-	to, err := os.Open(stto)
-	if err != nil {
-		// log.Warn("copy: ", err)
-	}
-	defer to.Close()
-	io.Copy(from, to)
+	RunCommand("cp " + stfrom + " " + stto)
 }
 
 func tempFileName(prefix, suffix string) string {
