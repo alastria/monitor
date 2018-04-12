@@ -11,3 +11,4 @@ fabric8-analytics.log
 services/conf
 .vscode/launch.json
 services/debug.test
+_vendor-*/
