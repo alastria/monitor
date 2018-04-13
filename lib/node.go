@@ -94,7 +94,7 @@ func Start() (ok bool) {
 
 // Clean Start an Alastria node
 func CleanStart() (ok bool) {
-	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/start.sh clean")
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh clean")
 	return
 }
 
@@ -174,7 +174,7 @@ func RestartNetwork(nodeType string, nodeName string) (ok bool) {
 	_, _ = RunCommand("cd " + homeDir + "/alastria-node/ && git pull")
 	_, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
 	ok1, _ := RunCommand("cd " + homeDir + "/alastria-node/scripts && ./init.sh backup " + nodeType + " " + nodeName)
-	ok2, _ := RunCommand(homeDir + "/alastria-node/scripts/start.sh")
+	ok2, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
 	if ok1 && ok2 {
 		return true
 	}
