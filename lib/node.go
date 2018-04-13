@@ -88,7 +88,7 @@ func Stop() (ok bool) {
 
 // Start an Alastria node
 func Start() (ok bool) {
-	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/start.sh")
+	ok, _ = RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
 	return
 }
 
