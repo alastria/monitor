@@ -88,7 +88,7 @@ func (m *MonitorController) GetVersion() {
 // @Description Check monitor version
 // @Success 202 {status, version} string Status (latest | updated)
 // @Failure 403 : overload
-// @router /update [post]
+// @router /update [get]
 func (m *MonitorController) GetVersionUpdate() {
 	output := make(map[string]string)
 	_, current := lib.CurrentMonitorVersion()

@@ -19,10 +19,10 @@ import (
 
 // URI to status message
 const status = "/v1/monitor/status"
-const versionupdate = "/v1/monitor/versionupdate"
+const versionupdate = "/v1/monitor/update"
 
 // URI to logjson message
-const logsjson = "/v1/node/logsjson"
+const logsjson = "/v1/node/log/json"
 
 const proposeURI = "/v1/node/propose"
 const coinbaseURI = "/v1/node/coinbase"

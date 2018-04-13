@@ -18,7 +18,7 @@ type NodeController struct {
 // @Description Updates files and restart node
 // @Success 202 {status} string
 // @Failure 403 : error
-// @router /update [post]
+// @router /update [get]
 func (m *NodeController) UpdateFiles() {
 	output := make(map[string]string)
 
