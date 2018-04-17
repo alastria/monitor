@@ -190,14 +190,14 @@ func (m *NodeController) Coinbase() {
 // @Description If the node is not mining start the miner
 // @Success 202 {status} mining
 // @Failure 403 : error
-// @router /ismining [post]
+// @router /ismining [get]
 func (m *NodeController) MineStart() {
 	output := make(map[string]string)
 	ok := lib.StartMining()
 	if ok {
-		output["status"] = "ok"
+		output["ismining"] = "true"
 	} else {
-		output["status"] = "error occurred"
+		output["ismining"] = "false"
 	}
 
 	m.Data["json"] = &output
@@ -208,7 +208,8 @@ func (m *NodeController) MineStart() {
 // @Description Get logs for the node
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /log/raw [get]
+// @router /info/raw [get]
+// TODO: This method fails because calls log.sh. This needs to be fixed.
 func (m *NodeController) GetLogs() {
 	output := make(map[string]string)
 	ok, data := lib.GetLog()
@@ -264,7 +265,7 @@ func (m *NodeController) NodeLastRestart() {
 // @Description Get logs with a fancy formatted JSON
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /log/json [get]
+// @router /info/json [get]
 func (m *NodeController) GetLogsJson() {
 	output := make(map[string]string)
 
@@ -308,10 +309,10 @@ func (m *NodeController) GetLogsJson() {
 }
 
 // @Title getIstanbulLog
-// @Description Get Istanbul related logs with a fancy formatted JSON
+// @Description Get Istanbul related info with a fancy formatted JSON
 // @Success 200 {status} logData
 // @Failure 403 : error
-// @router /log/istanbul [get]
+// @router /istanbul/info [get]
 func (m *NodeController) GetIstanbulLog() {
 	output := make(map[string]string)
 
