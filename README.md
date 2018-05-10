@@ -30,7 +30,7 @@ All the specific documentation for the API is also available through `/swagger`
 * `v1/monitor/version [GET]`: Checks current version of the monitor and if it is outdated.
 * `v1/monitor/update [GET]`: Checks current version of the monitor and updates it 
 automatically if it is outdated. *return(CURRENT_VERSION/STATUS/GETEXCEPTIONS)*
-* `v1/node/start/clean [POST]`: Makes a clean start of the node. *return(STATUS, GETEXCEPTIONS)*
+* `v1/node/start/clean [GET]`: Makes a clean start of the node. *return(STATUS, GETEXCEPTIONS)*
 * `v1/node/start/latest [GET]`: Checks the last time the node process was restarted
 * `v1/node/info/json [GET]`: Gets a complete log with useful information from a validator node in
 a JSON format
@@ -38,12 +38,12 @@ a JSON format
 * `v1/node/info/raw [GET]`: Gets a complete log in a raw format from the validator node
 * `v1/node/propose [POST] {id, value}`: It proposes a node with an `id` and a `value`
 for the propose
-* `v1/node/restart [POST]`: Restarts the node
+* `v1/node/restart [GET]`: Restarts the node
 * `v1/node/network/restart [POST] {nodeType, nodeName}`: Used for network restarts. It updates
 the node and reinitializes it for the new test-net conditions. *(EROR DE VALIDACIÓN DE NODOS 400)*
-* `v1/node/start/default [POST]`: Starts the node.
+* `v1/node/start/default [GET]`: Starts the node.
 * `v1/node/status [GET]` Gets the status of the node
-* `v1/node/stop [POST]`: Stops the node
+* `v1/node/stop [GET]`: Stops the node
 * `v1/node/update [GET]`: Updates every configuration file of the node from the alastria-node
 repository if they are outdated
 * `v1/node/version [GET]`: Checks the current version of the node
@@ -51,5 +51,6 @@ repository if they are outdated
 * `v1/node/transactions [DELETE]`: Cleans the transaction queue of the node
 * `v1/node/ismining [GET]`: Checks if the node is mining and, if this is not the case, it starts the miner
 
-
+**NOTE: By convention, we have decided to use GET methods for every call that does not send parameters, even if
+by definition a POST method should be used as it is a command request.** 
 

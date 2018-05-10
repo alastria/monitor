@@ -87,7 +87,7 @@ func (m *NodeController) TransactionsClean() {
 // @Description Stops the Alastria node
 // @Success 202 {status} string
 // @Failure 403 : error
-// @router /stop [post]
+// @router /stop [get	]
 func (m *NodeController) StopNode() {
 	output := make(map[string]string)
 	if lib.Stop() {
@@ -104,7 +104,7 @@ func (m *NodeController) StopNode() {
 // @Description Restarts Alastria node
 // @Success 202 {status} string
 // @Failure 403 : error
-// @router /restart [post]
+// @router /restart [get]
 func (m *NodeController) RestartNode() {
 	output := make(map[string]string)
 	if lib.Restart() {
