@@ -15,11 +15,13 @@ type MonitorController struct {
 }
 
 // @Title RestPostStatus
-// @Description Check status of the monitor REST
-// @Param	body		body 	models.StatusReq	true		"Request status of the monitor"
+// @Description Test simple POST method over the monitor
+// @Param	body		body 	models.StatusReq	true		"String to test simple POST method"
 // @Success 200  {map[string]string} Status information
 // @Failure 403 overload
-// @router /status [post]
+//TODO: Add error 400 if the json do not have testString parameter.
+//TODO: Generate method not allowed automatically when using other method.
+// @router /pingpong [post]
 func (m *MonitorController) RestPostStatus() {
 	var r models.StatusReq
 	json.Unmarshal(m.Ctx.Input.RequestBody, &r)
@@ -85,7 +87,8 @@ func (m *MonitorController) GetVersion() {
 }
 
 // @Title GetVersionUpdate
-// @Description Check monitor version
+// @Description Check monitor version. Ideally should be a POST method but as no parameters are
+//	involved we decide to user GET.
 // @Success 202 {status, version} string Status (latest | updated)
 // @Failure 403 : overload
 // @router /update [get]

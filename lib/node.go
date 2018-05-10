@@ -145,6 +145,7 @@ func Update() bool {
 }
 
 // Log an Alastria node
+// TODO: Modify to return the log in the request
 func GetLog() (ok bool, data string) {
 	ok, data = RunCommand(homeDir + "/alastria-node/scripts/log.sh")
 	return
