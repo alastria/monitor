@@ -166,7 +166,7 @@ func LatestMonitorVersion() (ok bool, version string) {
 
 // Get latest Version of the monitor
 func UpdateMonitor() (ok bool) {
-	ok1, _ := RunCommandBackground(homeDir + "/alastria-node/scripts/monitor.sh update")
+	ok1, _ := RunCommandBackground(homeDir + "/.alastria-node/scripts/monitor.sh update")
 	return ok1
 }
 

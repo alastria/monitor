@@ -87,7 +87,7 @@ func (m *MonitorController) GetVersion() {
 }
 
 // @Title GetVersionUpdate
-// @Description Check monitor version. Ideally should be a POST method but as no parameters are
+// @Description Check monitor version.
 //	involved we decide to user GET.
 // @Success 202 {status, version} string Status (latest | updated)
 // @Failure 403 : overload
