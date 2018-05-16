@@ -19,8 +19,6 @@ type MonitorController struct {
 // @Param	body		body 	models.StatusReq	true		"String to test simple POST method"
 // @Success 200  {map[string]string} Status information
 // @Failure 403 overload
-//TODO: Add error 400 if the json do not have testString parameter.
-//TODO: Generate method not allowed automatically when using other method.
 // @router /pingpong [post]
 func (m *MonitorController) RestPostStatus() {
 	var r models.StatusReq
@@ -87,7 +85,7 @@ func (m *MonitorController) GetVersion() {
 }
 
 // @Title GetVersionUpdate
-// @Description Check monitor version. Ideally should be a POST method but as no parameters are
+// @Description Check monitor version.
 //	involved we decide to user GET.
 // @Success 202 {status, version} string Status (latest | updated)
 // @Failure 403 : overload

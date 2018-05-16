@@ -29,8 +29,8 @@ All the specific documentation for the API is also available through `/swagger`
 * `v1/monitor/pingpong [POST] {testString}`: Tests a POST request to the monitor to see if it works
 * `v1/monitor/version [GET]`: Checks current version of the monitor and if it is outdated.
 * `v1/monitor/update [GET]`: Checks current version of the monitor and updates it 
-automatically if it is outdated. *return(CURRENT_VERSION/STATUS/GETEXCEPTIONS)*
-* `v1/node/start/clean [GET]`: Makes a clean start of the node. *return(STATUS, GETEXCEPTIONS)*
+automatically if it is outdated.
+* `v1/node/start/clean [GET]`: Makes a clean start of the node.
 * `v1/node/start/latest [GET]`: Checks the last time the node process was restarted
 * `v1/node/info/json [GET]`: Gets a complete log with useful information from a validator node in
 a JSON format
@@ -49,7 +49,7 @@ repository if they are outdated
 * `v1/node/version [GET]`: Checks the current version of the node
 * `v1/node/coinbase [GET]`: Checks the nodes coinbase
 * `v1/node/transactions [DELETE]`: Cleans the transaction queue of the node
-* `v1/node/ismining [GET]`: Checks if the node is mining and, if this is not the case, it starts the miner
+* `v1/node/mine [GET]`: Checks if the node is mining and, if this is not the case, it starts the miner.
 
 **NOTE: By convention, we have decided to use GET methods for every call that does not send parameters, even if
 by definition a POST method should be used as it is a command request.** 
