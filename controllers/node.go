@@ -22,7 +22,8 @@ type NodeController struct {
 func (m *NodeController) UpdateFiles() {
 	output := make(map[string]string)
 
-	if lib.Update() {
+	// if lib.Update() {
+	if lib.UpdateScript() {
 		output["status"] = "ok"
 	} else {
 		output["status"] = "error occurred"
@@ -87,7 +88,7 @@ func (m *NodeController) TransactionsClean() {
 // @Description Stops the Alastria node
 // @Success 202 {status} string
 // @Failure 403 : error
-// @router /stop [get	]
+// @router /stop [get]
 func (m *NodeController) StopNode() {
 	output := make(map[string]string)
 	if lib.Stop() {
@@ -190,7 +191,7 @@ func (m *NodeController) Coinbase() {
 // @Description If the node is not mining start the miner
 // @Success 202 {status} mining
 // @Failure 403 : error
-// @router /ismining [get]
+// @router /mine [get]
 func (m *NodeController) MineStart() {
 	output := make(map[string]string)
 	ok := lib.StartMining()
@@ -209,7 +210,6 @@ func (m *NodeController) MineStart() {
 // @Success 200 {status} logData
 // @Failure 403 : error
 // @router /info/raw [get]
-// TODO: This method fails because calls log.sh. This needs to be fixed.
 func (m *NodeController) GetLogs() {
 	output := make(map[string]string)
 	ok, data := lib.GetLog()
@@ -252,7 +252,7 @@ func (m *NodeController) NodeLastRestart() {
 	ok, data := lib.LastNodeRestart()
 	if ok {
 		output["status"] = "ok"
-		output["lastUpdate"] = data
+		output["lastRestart"] = data
 	} else {
 		output["status"] = "error occurred"
 	}

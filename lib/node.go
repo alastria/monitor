@@ -81,8 +81,14 @@ func RunCommandBackground(command string) (ok bool, salida string) {
 }
 
 // Stop an Alastria node
-func Stop() (ok bool) {
+func StopScript() (ok bool) {
 	_, _ = RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
+	return true
+}
+
+// Stop an Alastria node
+func Stop() (ok bool) {
+	_, _ = RunCommand("pkill -f geth")
 	return true
 }
 
@@ -110,14 +116,14 @@ func Update() bool {
 	var fichero []byte
 	RunCommand("cd " + homeDir + "/alastria-node && git pull")
 	// log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
-	stfile, static := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/static-nodes.json")
+	stfile, static := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/static-nodes.json")
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/NODE_TYPE")
 	NODE_TYPE = string(fichero)
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/static-nodes.json")
 	STATIC = string(fichero)
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/permissioned-nodes.json")
 	PERMISSIONED = string(fichero)
-	pmfile, permissioned := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/ibft/data/permissioned-nodes_" + NODE_TYPE + ".json")
+	pmfile, permissioned := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/permissioned-nodes_" + NODE_TYPE + ".json")
 	if strings.Compare(static, STATIC) != 0 || strings.Compare(permissioned, PERMISSIONED) != 0 {
 
 		// log.Trace("Son distintos")
@@ -133,9 +139,9 @@ func Update() bool {
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
 			// log.Trace("Hay que reiniciar el nodo...")
-			RunCommand(homeDir + "/alastria-node/scripts/stop.sh")
+			Stop()
 			time.Sleep(1000 * time.Millisecond)
-			RunCommandBackground(homeDir + "/alastria-node/scripts/start.sh")
+			Start()
 		}
 	}
 	if err != nil {
@@ -144,8 +150,12 @@ func Update() bool {
 	return true
 }
 
+func UpdateScript() (ok bool) {
+	ok, _ = RunCommand(homeDir + "/alastria-node/scripts/update.sh")
+	return
+}
+
 // Log an Alastria node
-// TODO: Modify to return the log in the request
 func GetLog() (ok bool, data string) {
 	ok, data = RunCommand(homeDir + "/alastria-node/scripts/log.sh")
 	return
@@ -166,7 +176,7 @@ func LatestMonitorVersion() (ok bool, version string) {
 
 // Get latest Version of the monitor
 func UpdateMonitor() (ok bool) {
-	ok1, _ := RunCommandBackground(homeDir + "/.alastria-node/scripts/monitor.sh update")
+	ok1, _ := RunCommand(homeDir + "/alastria-node/scripts/monitor.sh update")
 	return ok1
 }
 
