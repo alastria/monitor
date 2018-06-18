@@ -12,6 +12,7 @@ import (
 	"path/filepath"
 	"strings"
 	"time"
+	"errors"
 
 	"github.com/astaxie/beego/logs"
 	"github.com/hashicorp/go-getter"
@@ -261,8 +262,11 @@ func GetFile(fichero string) (contenido string) {
 	return
 }
 
-func copy(stfrom, stto string) {
-	RunCommand("cp " + stfrom + " " + stto)
+func copy(stfrom, stto string) (err error) {
+	_, ok = RunCommand("cp " + stfrom + " " + stto)
+	if !ok {
+	    return errors.New("Error copyting files")
+	}
 }
 
 func tempFileName(prefix, suffix string) string {
