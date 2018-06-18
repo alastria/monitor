@@ -22,8 +22,11 @@ var log *logs.BeeLogger
 
 var homeDir = os.Getenv("HOME")
 
-var STATIC_NODES = homeDir + "/alastria/data/static-nodes.json"
-var PERMISSIONED_NODES = homeDir + "/alastria/data/permissioned-nodes.json"
+var STATIC_NODES = homeDir + beego.AppConfig.String("StaticNodesFileDir")
+var PERMISSIONED_NODES = homeDir + beego.AppConfig.String("PermissionedNodesFileDir")
+
+// var STATIC_NODES = homeDir + "/alastria/data/static-nodes.json"
+// var PERMISSIONED_NODES = homeDir + "/alastria/data/permissioned-nodes.json"
 
 var IDENTITY, NODE_TYPE, STATIC, PERMISSIONED string
 
