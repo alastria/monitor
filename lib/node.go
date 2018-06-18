@@ -15,6 +15,7 @@ import (
 
 	"github.com/astaxie/beego/logs"
 	"github.com/hashicorp/go-getter"
+	"github.com/astaxie/beego"
 	//"github.com/alastria/monitor/services"
 )
 
