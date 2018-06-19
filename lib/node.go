@@ -143,9 +143,9 @@ func Update() bool {
 		// log.Debug(strings.Trim(static, "]"), strings.Trim(STATIC, "]"))
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
 			!strings.Contains(strings.Trim(permissioned, "]"), strings.Trim(PERMISSIONED, "]")) {
-			// log.Trace("Hay que reiniciar el nodo...")
 			Stop()
-			time.Sleep(1000 * time.Millisecond)
+			// Sleep not needed. Stop command runs immediately without the Background option 
+			// time.Sleep(1000 * time.Millisecond)
 			Start()
 		}
 	}
