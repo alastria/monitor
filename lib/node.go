@@ -121,14 +121,14 @@ func Update() bool {
 	var fichero []byte
 	RunCommand("cd " + homeDir + "/alastria-node && git pull")
 	// log.Debug("%s, %s, %s, %s", IDENTITY, NODE_TYPE, STATIC, PERMISSIONED)
-	stfile, static := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/static-nodes.json")
+	stfile, static, err := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/static-nodes.json")
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/NODE_TYPE")
 	NODE_TYPE = string(fichero)
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/static-nodes.json")
 	STATIC = string(fichero)
 	fichero, err = ioutil.ReadFile(homeDir + "/alastria/data/permissioned-nodes.json")
 	PERMISSIONED = string(fichero)
-	pmfile, permissioned := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/permissioned-nodes_" + NODE_TYPE + ".json")
+	pmfile, permissioned, err := GetGithub("https://raw.githubusercontent.com/alastria/alastria-node/feature/develop/data/permissioned-nodes_" + NODE_TYPE + ".json")
 	if strings.Compare(static, STATIC) != 0 || strings.Compare(permissioned, PERMISSIONED) != 0 {
 
 		// log.Trace("Son distintos")
@@ -244,10 +244,11 @@ func NodeVersion() (ok bool, salida string) {
 	return
 }
 
-func GetGithub(url string) (filename, contenido string) {
+func GetGithub(url string) (filename, contenido string, err error) {
 	filename = tempFileName("monitor", ".json")
-	err := getter.GetFile(filename, url)
+	err = getter.GetFile(filename, url)
 	if err != nil {
+	    err = errors.New("Error updating files from Github")
 		// log.Warn("GetGithub: %s", err)
 	}
 	if err == nil {
