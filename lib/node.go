@@ -267,6 +267,7 @@ func copy(stfrom, stto string) (err error) {
 	if !ok {
 	    return errors.New("Error copying files")
 	}
+	return
 }
 
 func tempFileName(prefix, suffix string) string {
