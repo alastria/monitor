@@ -263,7 +263,7 @@ func GetFile(fichero string) (contenido string) {
 }
 
 func copy(stfrom, stto string) (err error) {
-	_, ok = RunCommand("cp " + stfrom + " " + stto)
+	_, ok := RunCommand("cp " + stfrom + " " + stto)
 	if !ok {
 	    return errors.New("Error copyting files")
 	}
