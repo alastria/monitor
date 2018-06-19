@@ -134,11 +134,11 @@ func Update() bool {
 		// log.Trace("Son distintos")
 		if strings.Compare(static, STATIC) != 0 {
 			// log.Trace("Actualizando static-nodes")
-			err := copy(stfile, STATIC_NODES)
+			err = copy(stfile, STATIC_NODES)
 		}
 		if strings.Compare(permissioned, PERMISSIONED) != 0 {
 			// log.Trace("Actualizando permissioned-nodes")
-			err  := copy(pmfile, PERMISSIONED_NODES)
+			err  = copy(pmfile, PERMISSIONED_NODES)
 		}
 		// log.Debug(strings.Trim(static, "]"), strings.Trim(STATIC, "]"))
 		if !strings.Contains(strings.Trim(static, "]"), strings.Trim(STATIC, "]")) ||
